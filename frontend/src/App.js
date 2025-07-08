@@ -1,59 +1,92 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import ProductList from './components/ProductList';
 import ProductDetail from './components/ProductDetail';
-import { fetchProducts, analyzeProduct } from './api/client'; // Import API functions
-
+import { fetchProducts, analyzeProduct } from './api/client';
 import './App.css';
 
 function App() {
-  const [products, setProducts] = useState();
+  const [products, setProducts] = useState([]); // Initialize as empty array
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState({
+    products: true,
+    analysis: false
+  });
   const [error, setError] = useState(null);
-  const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
+
+  // Memoized fetch function to prevent unnecessary recreations
+  const fetchProductsData = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(prev => ({ ...prev, products: true }));
+      
+      const response = await fetchProducts();
+      
+      if (!response?.data) {
+        throw new Error('Invalid response from server');
+      }
+      
+      setProducts(response.data);
+    } catch (err) {
+      setError(`Failed to load products: ${err.message}`);
+      console.error('API Error:', err);
+      setProducts([]); // Reset to empty array on error
+    } finally {
+      setLoading(prev => ({ ...prev, products: false }));
+    }
+  }, []);
 
   useEffect(() => {
-    const getProducts = async () => {
-      try {
-        setError(null);
-        setIsLoading(true);
-        const response = await fetchProducts();
-        setProducts(response.data);
-      } catch (err) {
-        setError('Failed to load products. Is the backend server running?');
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
+    let isMounted = true;
+    
+    const loadData = async () => {
+      await fetchProductsData();
     };
-    getProducts();
-  },);
+
+    if (isMounted) {
+      loadData();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchProductsData]);
 
   const handleProductSelect = async (product) => {
+    if (!product?.id) return;
+    
     setSelectedProduct(product);
-    setIsAnalysisLoading(true);
-    setAnalysisResult(null); // Clear previous analysis
+    setLoading(prev => ({ ...prev, analysis: true }));
+    setAnalysisResult(null);
+
     try {
       const response = await analyzeProduct(product.id);
+      
+      if (!response?.data) {
+        throw new Error('Invalid analysis response');
+      }
+      
       setAnalysisResult(response.data);
     } catch (err) {
-      console.error("Failed to get analysis:", err);
-      // Set a default error structure for the detail view
+      console.error("Analysis Error:", err);
       setAnalysisResult({ 
         recommendation: 'Error', 
-        analysis: { rulesTriggered: ['Could not retrieve analysis from server.'] } 
+        analysis: { 
+          rulesTriggered: [`Analysis failed: ${err.message}`],
+          summary: 'Could not retrieve analysis'
+        },
+        error: true
       });
     } finally {
-      setIsAnalysisLoading(false);
+      setLoading(prev => ({ ...prev, analysis: false }));
     }
   };
 
-  const handleBackToProducts = () => {
+  const handleBackToProducts = useCallback(() => {
     setSelectedProduct(null);
     setAnalysisResult(null);
-  };
+  }, []);
 
   const renderContent = () => {
     if (selectedProduct) {
@@ -61,20 +94,20 @@ function App() {
         <ProductDetail 
           product={selectedProduct} 
           analysis={analysisResult}
-          isLoading={isAnalysisLoading}
+          isLoading={loading.analysis}
           onBack={handleBackToProducts} 
         />
       );
-    } else {
-      return (
-        <ProductList 
-          products={products} 
-          onProductSelect={handleProductSelect}
-          isLoading={isLoading}
-          error={error}
-        />
-      );
     }
+
+    return (
+      <ProductList 
+        products={products} 
+        onProductSelect={handleProductSelect}
+        isLoading={loading.products}
+        error={error}
+      />
+    );
   };
 
   return (

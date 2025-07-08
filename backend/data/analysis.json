@@ -1,0 +1,25 @@
+{
+  "recommendation": "Use Substitute",
+  "analysis": {
+    "productId": 2,
+    "productName": "Apple iPhone 15",
+    "inputs": {
+      "tariffRate": 0.25,
+      "demandSignal": -0.65,
+      "weatherFactor": 0,
+      "inventoryLevel": 45,
+      "salesVelocity": 5
+    },
+    "scores": {
+      "costImpactScore": -0.8,
+      "demandScore": -0.65,
+      "urgencyScore": 0.2
+    },
+    "rulesTriggered": [
+      "High tariff impacts cost score negatively.",
+      "Negative news sentiment indicates low demand.",
+      "Low sales velocity reduces urgency."
+    ],
+    "substitutes": []
+  }
+}

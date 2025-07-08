@@ -1,0 +1,94 @@
+/* Core Layout */
+.deeper-analysis-dashboard {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Grid System */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+/* Card Styles (compatible with all packages) */
+.chart-container,
+.json-container,
+.rules-container {
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: white;
+}
+
+/* Specific to react-chartjs-2 */
+.chart-container {
+  min-height: 300px; /* Ensures chart has room */
+  position: relative; /* Required for chart.js responsive behavior */
+}
+
+/* Specific to @uiw/react-json-view */
+.json-container .w-rjv {
+  padding: 10px;
+  background: #f8f9fa !important; /* Overrides default dark bg */
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+/* Rules List */
+.rules-container {
+  grid-column: 1 / -1;
+  background: #f8f9fa;
+}
+
+.rules-container ul {
+  padding-left: 20px;
+  margin: 0;
+  list-style-type: none;
+}
+
+.rules-container li {
+  margin-bottom: 8px;
+  font-family: 'SF Mono', Menlo, monospace;
+  font-size: 0.85rem;
+  position: relative;
+  padding-left: 20px;
+}
+
+.rules-container li:before {
+  content: "•";
+  color: #6c757d;
+  position: absolute;
+  left: 0;
+}
+
+/* Responsive Fixes */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-container,
+  .json-container {
+    grid-column: auto;
+  }
+}
+
+/* Header Styles */
+.deeper-analysis-dashboard h3 {
+  color: #2c3e50;
+  margin: 0 0 15px 0;
+  font-size: 1.3rem;
+}
+
+.deeper-analysis-dashboard h4 {
+  color: #495057;
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+}

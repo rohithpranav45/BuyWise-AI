@@ -1,0 +1,12 @@
+{
+  "China": {
+    "Electronics": 0.25,
+    "Apparel": 0.15
+  },
+  "Vietnam": {
+    "Apparel": 0.10
+  },
+  "USA": {
+    "Canned Goods": 0.00
+  }
+}

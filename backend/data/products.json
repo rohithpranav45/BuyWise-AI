@@ -1,0 +1,47 @@
+[
+  {
+    "id": "prod_101",
+    "name": "Samsung 65-inch QLED 4K Smart TV",
+    "category": "electronics",
+    "countryOfOrigin": "Vietnam",
+    "supplier": "Samsung Electronics Co., Ltd.",
+    "baseCost": 850.00,
+    "features": ["65-inch", "QLED", "4K", "Smart TV", "HDR"]
+  },
+  {
+    "id": "prod_102",
+    "name": "LG 65-inch OLED 4K Smart TV",
+    "category": "electronics",
+    "countryOfOrigin": "Mexico",
+    "supplier": "LG Electronics Inc.",
+    "baseCost": 920.00,
+    "features": ["65-inch", "OLED", "4K", "Smart TV", "Dolby Vision"]
+  },
+  {
+    "id": "prod_103",
+    "name": "Sony 55-inch LED 4K Smart TV",
+    "category": "electronics",
+    "countryOfOrigin": "China",
+    "supplier": "Sony Corporation",
+    "baseCost": 780.00,
+    "features": ["55-inch", "LED", "4K", "Smart TV", "HDR"]
+  },
+  {
+    "id": "prod_201",
+    "name": "Men's Cotton T-Shirt (3-Pack)",
+    "category": "apparel",
+    "countryOfOrigin": "Bangladesh",
+    "supplier": "Global Apparel Solutions",
+    "baseCost": 12.50,
+    "features": ["Cotton", "Crew Neck", "Short Sleeve", "Machine Washable"]
+  },
+  {
+    "id": "prod_202",
+    "name": "Men's Performance Polo Shirt",
+    "category": "apparel",
+    "countryOfOrigin": "Vietnam",
+    "supplier": "Dynamic Fabrics Inc.",
+    "baseCost": 15.00,
+    "features": ["Polyester", "Moisture-Wicking", "Short Sleeve", "UV Protection"]
+  }
+]

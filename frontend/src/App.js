@@ -20,18 +20,26 @@ function App() {
     try {
       setError(null);
       setLoading(prev => ({ ...prev, products: true }));
-      
+    
       const response = await fetchProducts();
-      
-      if (!response?.data) {
-        throw new Error('Invalid response from server');
+    
+      if  (!response?.data) {
+        throw new Error('Server responded with no data');
       }
-      
+    
       setProducts(response.data);
     } catch (err) {
-      setError(`Failed to load products: ${err.message}`);
+      let errorMessage = err.message;
+    
+      if (err.message.includes('Network Error')) {
+        errorMessage = 'Backend server is unavailable. Please try again later.';
+      } else if (err.message.includes('timeout')) {
+      errorMessage = 'Backend is waking up (Render free tier). Try refreshing in 30 seconds.';
+      }
+    
+      setError(errorMessage);
       console.error('API Error:', err);
-      setProducts([]); // Reset to empty array on error
+      setProducts([]);
     } finally {
       setLoading(prev => ({ ...prev, products: false }));
     }

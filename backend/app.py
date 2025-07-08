@@ -1,40 +1,71 @@
 import os
 import json
-from flask import Flask, jsonify
-from flask_cors import CORS # Import CORS
-from dotenv import load_dotenv # Import load_dotenv
-from flask import request # Import request
-from services import news_service, weather_service, decision_service # Import services
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+from dotenv import load_dotenv
+from services import news_service, weather_service, decision_service
 
-# Load environment variables from.env file
+# Load environment variables from .env file
 load_dotenv()
 
 # Initialize the Flask application
 app = Flask(__name__)
 
 # --- CORS Configuration ---
-# This will allow the React app running on localhost:3000 to make requests
-# to this Flask server running on localhost:5001.
-CORS(app, resources={r"/api/*": {"origins": "https://projectsparkathon-i8u3xygly-rohithpranav45s-projects.vercel.app"}})
+# List of allowed origins (add all your frontend URLs)
+allowed_origins = [
+    "https://projectsparkathon.vercel.app",          # Production frontend
+    "https://projectsparkathon-*.vercel.app",        # Vercel preview deployments
+    "http://localhost:3000",                         # Local development
+    "http://127.0.0.1:3000"                          # Alternative localhost
+]
 
-# Function to load JSON data from a file
+# Configure CORS with explicit settings
+CORS(
+    app,
+    resources={
+        r"/api/*": {
+            "origins": allowed_origins,
+            "methods": ["GET", "POST", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": False,
+            "max_age": 86400  # Cache preflight requests for 24 hours
+        }
+    }
+)
+
+# Handle OPTIONS requests globally
+@app.after_request
+def after_request(response):
+    """Add CORS headers to all responses"""
+    origin = request.headers.get('Origin')
+    if origin and any(
+        origin.startswith(allowed.replace('*', '')) 
+        for allowed in allowed_origins
+    ):
+        response.headers.add('Access-Control-Allow-Origin', origin)
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+    return response
+
+# --- Helper Functions ---
 def load_json_data(filename):
     """Loads JSON data from a file in the 'data' directory."""
     filepath = os.path.join(os.path.dirname(__file__), 'data', filename)
     try:
-        with open(filepath, 'r') as f:
+        with open(filepath, 'r', encoding='utf-8') as f:  # Explicit encoding for Windows
             return json.load(f)
     except FileNotFoundError:
         if 'products' in filename:
             return []
-        else:
-            return {}
+        return {}
     except json.JSONDecodeError:
         return {"error": f"Invalid JSON in {filename}"}
 
+# --- API Routes ---
 @app.route('/api/health')
 def health_check():
-    return {"status": "ok"}
+    return jsonify({"status": "ok", "message": "Server is running"})
 
 @app.route('/api/products')
 def get_products():
@@ -59,24 +90,19 @@ def analyze_product():
         return jsonify({"error": "productId is required"}), 400
 
     product_id = data['productId']
-
-    # 1. Find the product from our data
     all_products = load_json_data('products.json')
     product = next((p for p in all_products if p['id'] == product_id), None)
     
     if not product:
         return jsonify({"error": "Product not found"}), 404
 
-    # 2. Get the applicable tariff rate
     all_tariffs = load_json_data('tariffs.json')
     origin_country = product.get('originCountry')
     category = product.get('category')
     tariff_rate = all_tariffs.get(origin_country, {}).get(category, 0.0)
 
-    # 3. Get the demand signal from the news service
     demand_signal = news_service.get_demand_signal(product.get('name'))
 
-    # 4. Pass all data to the decision service
     result = decision_service.get_procurement_recommendation(
         product=product,
         tariff_rate=tariff_rate,
@@ -87,21 +113,23 @@ def analyze_product():
 
 @app.route('/api/substitute', methods=['POST'])
 def get_substitutes():
-    """
-    Endpoint to find substitutes for a given product.
-    Expects a JSON body with 'productId'.
-    """
+    """Endpoint to find substitutes for a given product."""
     data = request.get_json()
     if not data or 'productId' not in data:
         return jsonify({"error": "productId is required"}), 400
 
     product_id = data['productId']
     all_products = load_json_data('products.json')
-
     substitutes = decision_service.find_substitutes(product_id, all_products)
     
     return jsonify(substitutes)
 
-# Main entry point for the application
+# --- Windows-Specific Configuration ---
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    # Windows-specific settings
+    app.run(
+        debug=True,
+        port=int(os.getenv('PORT', 5001)),  # Use PORT from environment or default to 5001
+        host='0.0.0.0',                     # Allow connections from all network interfaces
+        threaded=True                       # Better performance for Windows
+    )

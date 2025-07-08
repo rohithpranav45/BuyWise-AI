@@ -15,7 +15,7 @@ app = Flask(__name__)
 # --- CORS Configuration ---
 # This will allow the React app running on localhost:3000 to make requests
 # to this Flask server running on localhost:5001.
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/api/*": {"origins": "https://projectsparkathon-i8u3xygly-rohithpranav45s-projects.vercel.app"}})
 
 # Function to load JSON data from a file
 def load_json_data(filename):

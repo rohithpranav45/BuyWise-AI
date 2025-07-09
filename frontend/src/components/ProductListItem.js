@@ -3,43 +3,42 @@ import PropTypes from 'prop-types';
 import './ProductListItem.css';
 
 const ProductListItem = ({ product, onProductSelect }) => {
-  // Safely handle undefined/null product
-  const safeProduct = {
+  // Normalize product to flatten it directly (NO nesting)
+  const normalizedProduct = {
     ...product,
     id: product?.id || product?._id || null
   };
-  
-  // Safely access nested inventory
-  const stock = safeProduct.inventory?.stock ?? 'N/A';
-  const sku = safeProduct.sku || 'No SKU';
-  const imageUrl = safeProduct.imageUrl || '/placeholder-product.png';
 
   const handleClick = () => {
-    console.log("👆 Clicked product:", safeProduct);
-    if (typeof onProductSelect === 'function' && safeProduct.id) {
-      onProductSelect(safeProduct);
+    console.log("👆 Clicked product:", normalizedProduct);
+    if (typeof onProductSelect === 'function' && normalizedProduct.id) {
+      onProductSelect(normalizedProduct); // ✅ send clean, flattened product
     } else {
-      console.warn("Missing product is:", safeProduct);
+      console.warn("⚠️ Invalid product selected:", normalizedProduct);
     }
   };
 
+  const stock = normalizedProduct.inventory?.stock ?? 'N/A';
+  const sku = normalizedProduct.sku || 'No SKU';
+  const imageUrl = normalizedProduct.imageUrl || '/placeholder-product.png';
+
   return (
-    <div 
-      className="product-list-item" 
+    <div
+      className="product-list-item"
       onClick={handleClick}
-      role="button" 
+      role="button"
       tabIndex={0}
-      aria-label={`View details for ${safeProduct.name || 'product'}`}
+      aria-label={`View details for ${normalizedProduct.name || 'product'}`}
     >
-      <img 
-        src={imageUrl} 
-        alt={safeProduct.name || 'Product image'} 
+      <img
+        src={imageUrl}
+        alt={normalizedProduct.name || 'Product image'}
         className="product-image"
         onError={(e) => {
           e.target.src = '/placeholder-product.png';
         }}
       />
-      <h3>{safeProduct.name || 'Unnamed Product'}</h3>
+      <h3>{normalizedProduct.name || 'Unnamed Product'}</h3>
       <p>SKU: {sku}</p>
       <p>Stock: {stock}</p>
     </div>
@@ -48,26 +47,15 @@ const ProductListItem = ({ product, onProductSelect }) => {
 
 ProductListItem.propTypes = {
   product: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     name: PropTypes.string,
     sku: PropTypes.string,
     imageUrl: PropTypes.string,
     inventory: PropTypes.shape({
       stock: PropTypes.number
     })
-  }),
+  }).isRequired,
   onProductSelect: PropTypes.func.isRequired
-};
-
-ProductListItem.defaultProps = {
-  product: {
-    name: 'Unnamed Product',
-    sku: 'No SKU',
-    imageUrl: '/placeholder-product.png',
-    inventory: {
-      stock: 0
-    }
-  }
 };
 
 export default ProductListItem;

@@ -153,7 +153,7 @@ function App() {
   };
 
   // Navigate back to product list
-  const handleBackToProducts = useCallback = (() => {
+  const handleBackToProducts = useCallback(() => {
     setSelectedProduct(null);
     setAnalysisResult(null);
     setError(null);

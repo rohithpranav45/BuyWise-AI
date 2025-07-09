@@ -5,7 +5,7 @@ const getApiBaseUrl = () => {
   // Production detection
   if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
     // If your backend is deployed separately, update this URL
-    return 'https://your-backend-deployment.vercel.app/api';
+    return 'https://projectsparkathon-backend.onrender.com/api';
   }
   
   // Use environment variable if available

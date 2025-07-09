@@ -4,7 +4,10 @@ import './ProductListItem.css';
 
 const ProductListItem = ({ product, onProductSelect }) => {
   // Safely handle undefined/null product
-  const safeProduct = product || {};
+  const safeProduct = {
+    ...product,
+    id: product?.id || product?._id || null
+  };
   
   // Safely access nested inventory
   const stock = safeProduct.inventory?.stock ?? 'N/A';
@@ -12,8 +15,11 @@ const ProductListItem = ({ product, onProductSelect }) => {
   const imageUrl = safeProduct.imageUrl || '/placeholder-product.png';
 
   const handleClick = () => {
+    console.log("👆 Clicked product:", safeProduct);
     if (typeof onProductSelect === 'function' && safeProduct.id) {
       onProductSelect(safeProduct);
+    } else {
+      console.warn("Missing product is:", safeProduct);
     }
   };
 

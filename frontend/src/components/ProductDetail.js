@@ -3,16 +3,28 @@ import PropTypes from 'prop-types';
 import DeeperAnalysisDashboard from './DeeperAnalysisDashboard';
 import './ProductDetail.css';
 
+console.log("🧩 Product received in ProductDetail:", product);
+// Ensure the product prop is valid
+
 const ProductDetail = ({ product, analysis, isLoading, onBack }) => {
   // Debug: Log product to ensure it’s valid
   console.log('🛠️ Rendering ProductDetail:', product);
+
+  if (typeof onBack !== 'function') {
+    console.warn('❌ onBack prop missing or not a function in ProductDetail');
+  }
 
   // Safety check: product or inventory missing
   if (!product || typeof product !== 'object') {
     return (
       <div className="product-detail-fallback">
         <p>⚠️ Product details are unavailable.</p>
-        <button onClick={onBack} className="back-button" style={{ marginTop: '12px' }}>
+        <button
+          onClick={onBack}
+          className="back-button"
+          style={{ marginTop: '12px' }}
+          disabled={typeof onBack !== 'function'}
+        >
           &larr; Back to Products
         </button>
       </div>

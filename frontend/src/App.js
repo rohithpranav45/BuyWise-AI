@@ -104,7 +104,11 @@ function App() {
 
   // Enhanced product selection with better error handling
   const handleProductSelect = async (product) => {
-    if (!product?.id) {
+    console.log("📥 handleProductSelect called with:", product);
+    console.log("✅ Product.name:", product.name);
+    console.log("✅ Product.id:", product.id);
+    if (!product || !product.id) {
+      console.warn("❌ Invalid product selected:", product);
       setError('Invalid product selected');
       return;
     }
@@ -149,7 +153,7 @@ function App() {
   };
 
   // Navigate back to product list
-  const handleBackToProducts = useCallback(() => {
+  const handleBackToProducts = useCallback = (() => {
     setSelectedProduct(null);
     setAnalysisResult(null);
     setError(null);
@@ -308,6 +312,24 @@ function App() {
         {renderContent()}
       </main>
       {renderDebugInfo()}
+      {/* ✅ Emergency Debug Overlay */}
+      {process.env.NODE_ENV === "development" && selectedProduct && (
+        <div style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: 'rgba(0,0,0,0.8)',
+          color: '#fff',
+          padding: '8px',
+          zIndex: 9999,
+          fontFamily: 'monospace',
+          maxHeight: '40vh',
+          overflowY: 'auto'
+        }}>
+          Debug: Selected → <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(selectedProduct, null, 2)}</pre>
+        </div>
+      )}
     </div>
   );
 }

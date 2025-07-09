@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import DeeperAnalysisDashboard from './DeeperAnalysisDashboard';
 import './ProductDetail.css';
 
-console.log("🧩 Product received in ProductDetail:", product);
 // Ensure the product prop is valid
 
 const ProductDetail = ({ product, analysis, isLoading, onBack }) => {

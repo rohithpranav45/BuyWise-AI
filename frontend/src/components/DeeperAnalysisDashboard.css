@@ -16,7 +16,7 @@
   margin-top: 15px;
 }
 
-/* Card Styles (compatible with all packages) */
+/* Card Styles */
 .chart-container,
 .json-container,
 .rules-container {
@@ -28,14 +28,14 @@
 
 /* Specific to react-chartjs-2 */
 .chart-container {
-  min-height: 300px; /* Ensures chart has room */
-  position: relative; /* Required for chart.js responsive behavior */
+  min-height: 300px;
+  position: relative;
 }
 
 /* Specific to @uiw/react-json-view */
 .json-container .w-rjv {
   padding: 10px;
-  background: #f8f9fa !important; /* Overrides default dark bg */
+  background: #f8f9fa !important;
   border-radius: 6px;
   font-size: 13px;
 }
@@ -67,12 +67,30 @@
   left: 0;
 }
 
+/* Suggested Substitutes Section */
+.substitute-section {
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-left: 4px solid #ccc;
+}
+
+.substitute-list {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.substitute-item {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
 /* Responsive Fixes */
 @media (max-width: 768px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .chart-container,
   .json-container {
     grid-column: auto;
@@ -91,4 +109,28 @@
   margin: 0 0 12px 0;
   font-size: 1rem;
   font-weight: 600;
+}
+
+.inputs-section {
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.inputs-section h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.inputs-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.inputs-section li {
+  margin: 6px 0;
+  font-size: 14px;
 }

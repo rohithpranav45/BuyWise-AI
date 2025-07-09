@@ -11,6 +11,7 @@ def get_news_for_product(product_name):
     Fetches news articles related to a specific product name.
     """
     if not NEWS_API_KEY:
+        print("New API key missing. Skipping news fetch.")
         return {"error": "News API key is not configured."}
 
     params = {
@@ -24,10 +25,13 @@ def get_news_for_product(product_name):
     try:
         response = requests.get(NEWS_API_URL, params=params)
         response.raise_for_status()
+        print(f"✓ News articles fetched for '{product_name}'")
         return response.json()
     except requests.exceptions.HTTPError as http_err:
+        print(f"✗ News HTTP error: {http_err}")
         return {"error": f"HTTP error occurred: {http_err}", "details": response.text}
     except requests.exceptions.RequestException as err:
+        print(f"✗ News request failed: {err}")
         return {"error": f"An error occurred: {err}"}
 
 def get_demand_signal(product_name):
@@ -38,6 +42,7 @@ def get_demand_signal(product_name):
     news_data = get_news_for_product(product_name)
     
     if 'error' in news_data or not news_data.get('articles'):
+        print(f"⚠️ No news data for '{product_name}'. Defaulting to neutral signal.")
         return 0.0 # Return neutral if no news or an error occurred
 
     polarities = []
@@ -53,8 +58,10 @@ def get_demand_signal(product_name):
         polarities.append(analysis.sentiment.polarity)
 
     if not polarities:
+        print(f"⚠️ No valid sentiment for '{product_name}' news.")
         return 0.0 # Return neutral if no valid articles were processed
 
     # Return the average polarity
     average_polarity = sum(polarities) / len(polarities)
+    print(f"📈 Demand signal for '{product_name}': {average_polarity:.2f}")
     return average_polarity

@@ -3,6 +3,10 @@ import json
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
+from services.decision_service import get_procurement_recommendation
+from services.news_service import get_demand_signal
+from services.decision_service import find_substitutes
+from services.weather_service import get_local_weather
 
 # Load environment variables from .env file
 load_dotenv()
@@ -91,7 +95,7 @@ def get_tariffs():
 @app.route('/api/analyze', methods=['POST'])
 def analyze_product():
     """
-    Endpoint to run analysis for a single product.
+    Analyzes the product and returns a structured recommendation.
     Expects a JSON body with 'productId'.
     """
     try:
@@ -101,49 +105,41 @@ def analyze_product():
 
         product_id = data['productId']
         all_products = load_json_data('products.json')
-        
         if not all_products:
             return jsonify({"error": "Products data not available"}), 500
-            
+
         product = next((p for p in all_products if p['id'] == product_id), None)
-        
         if not product:
             return jsonify({"error": "Product not found"}), 404
 
-        # Get tariff data
+        # Ensure required fields
+        if 'price' not in product:
+            product['price'] = product.get('baseCost', 100.0) * 1.2
+        if 'inventory' not in product:
+            product['inventory'] = {
+                'stock': 20,
+                'salesVelocity': 3
+            }
+
+        # Load tariff rate
         all_tariffs = load_json_data('tariffs.json')
-        origin_country = product.get('originCountry', 'Unknown')
+        origin_country = product.get('countryOfOrigin', 'Unknown')
         category = product.get('category', 'Unknown')
         tariff_rate = all_tariffs.get(origin_country, {}).get(category, 0.0)
 
-        # Simplified analysis since external services might not be available
-        result = {
-            "recommendation": "Buy" if tariff_rate < 0.15 else "Hold",
-            "analysis": {
-                "rulesTriggered": [
-                    f"Product: {product.get('name', 'Unknown')}",
-                    f"Origin: {origin_country}",
-                    f"Category: {category}",
-                    f"Tariff Rate: {tariff_rate * 100:.1f}%",
-                    f"Price: ${product.get('price', 0)}"
-                ],
-                "summary": f"Analysis completed for {product.get('name', 'product')}. " +
-                          f"Tariff rate is {tariff_rate * 100:.1f}%. " +
-                          ("Recommended for purchase." if tariff_rate < 0.15 else "Consider alternatives.")
-            },
-            "confidence": 0.8,
-            "tariff_rate": tariff_rate,
-            "product_info": {
-                "name": product.get('name'),
-                "price": product.get('price'),
-                "category": category,
-                "origin": origin_country
-            }
-        }
-        
+        # Get demand signal
+        demand_signal = get_demand_signal(product.get('name')) if product.get('name') else 0.0
+
+        # Get weather factor
+        weather = get_local_weather()
+        weather_factor = weather.get('weatherFactor', 0.0)
+
+        # Perform rule-based recommendation
+        result = get_procurement_recommendation(product, tariff_rate, demand_signal, weather_factor)
+
         print(f"✓ Analysis completed for product {product_id}")
         return jsonify(result)
-        
+
     except Exception as e:
         print(f"✗ Analysis error: {e}")
         return jsonify({
@@ -154,10 +150,12 @@ def analyze_product():
                 "summary": "Could not complete analysis"
             }
         }), 500
-
 @app.route('/api/substitute', methods=['POST'])
 def get_substitutes():
-    """Endpoint to find substitutes for a given product."""
+    """
+    Finds and returns similar substitute products using feature similarity.
+    Expects { "productId": "prod_001" } in the request body.
+    """
     try:
         data = request.get_json()
         if not data or 'productId' not in data:
@@ -165,33 +163,22 @@ def get_substitutes():
 
         product_id = data['productId']
         all_products = load_json_data('products.json')
-        
         if not all_products:
             return jsonify([])
-            
-        # Find the target product
-        target_product = next((p for p in all_products if p['id'] == product_id), None)
-        if not target_product:
+
+        # Use the actual similarity engine
+        substitutes = find_substitutes(product_id, all_products)
+        if not substitutes:
+            print(f"⚠️ No substitutes found for product {product_id}")
             return jsonify([])
-            
-        # Simple substitute finding logic
-        target_category = target_product.get('category')
-        substitutes = [
-            product for product in all_products 
-            if product['id'] != product_id and 
-            product.get('category') == target_category
-        ]
-        
-        # Limit to 5 substitutes
-        substitutes = substitutes[:5]
-        
+
         print(f"✓ Found {len(substitutes)} substitutes for product {product_id}")
         return jsonify(substitutes)
-        
-    except Exception as e:
-        print(f"✗ Error finding substitutes: {e}")
-        return jsonify([])
 
+    except Exception as e:
+        print(f"✗ Substitute finding error: {e}")
+        return jsonify({"error": "Failed to find substitutes"}), 500
+    
 # Error handlers
 @app.errorhandler(404)
 def not_found(error):

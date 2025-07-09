@@ -19,7 +19,6 @@ def find_substitutes(target_product_id, all_products):
 
     # --- Feature Engineering ---
     # Select features for similarity calculation
-    # For a robust model, more feature engineering would be needed here
     features_for_similarity = ['category', 'price', 'type', 'size_oz', 'brand']
     
     # Create a dataframe with only the features we need, and handle missing values
@@ -51,20 +50,20 @@ def find_substitutes(target_product_id, all_products):
     sim_scores = list(enumerate(cosine_sim_matrix[target_idx]))
     
     # Sort the products based on the similarity scores
-    sim_scores = sorted(sim_scores, key=lambda x: x, reverse=True)
+    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     
     # Get the scores of the top 3 most similar products (excluding itself, which is at index 0)
     sim_scores = sim_scores[1:4]
     
     # Get the product indices
-    product_indices = [i for i in sim_scores]
+    product_indices = [i[0] for i in sim_scores]
     
     # Get the actual product IDs from the indices
     similar_product_ids = id_to_idx.iloc[product_indices].tolist()
 
     # Format the output
     substitutes = []
-    for i, score in zip(similar_product_ids, [s for s in sim_scores]):
+    for i, score in zip(similar_product_ids, sim_scores):
         substitute_product = df[df['id'] == i].to_dict('records')
         if substitute_product:
             substitute_product = substitute_product[0]
@@ -77,7 +76,7 @@ def find_substitutes(target_product_id, all_products):
         
     return substitutes
 
-def get_procurement_recommendation(product, tariff_rate, demand_signal):
+def get_procurement_recommendation(product, tariff_rate, demand_signal, weather_factor=0.0):
     """
     Analyzes various factors and returns a procurement recommendation using a rule-based engine.
     """
@@ -87,7 +86,7 @@ def get_procurement_recommendation(product, tariff_rate, demand_signal):
     # Normalize inputs into scores from -1.0 to 1.0
 
     # Cost Impact Score: Higher tariff means more negative impact
-    cost_impact_score = -1 * (tariff_rate / 0.25) # Normalize based on a max expected tariff of 25%
+    cost_impact_score = -1 * (tariff_rate / 0.25)  # Normalize based on a max expected tariff of 25%
     if tariff_rate > 0.15:
         rules_triggered.append(f"High tariff ({tariff_rate:.0%}) negatively impacts cost score.")
     elif tariff_rate > 0.05:
@@ -107,7 +106,7 @@ def get_procurement_recommendation(product, tariff_rate, demand_signal):
     # Urgency Score: based on inventory vs. sales velocity
     inventory = product.get('inventory', {})
     stock = inventory.get('stock', 0)
-    velocity = inventory.get('salesVelocity', 1) # Avoid division by zero
+    velocity = inventory.get('salesVelocity', 1)  # Avoid division by zero
     days_of_stock = stock / velocity if velocity > 0 else float('inf')
     
     urgency_score = 0
@@ -121,33 +120,40 @@ def get_procurement_recommendation(product, tariff_rate, demand_signal):
         urgency_score = -0.5
         rules_triggered.append(f"Sufficient inventory ({days_of_stock:.1f} days of stock remaining). Low urgency.")
 
+    # Weather adjustment (experimental logic)
+    if weather_factor >= 1.0:
+        urgency_score += 0.2
+        rules_triggered.append("Bad weather detected — slightly increasing urgency score.")
+    elif weather_factor <= 0:
+        rules_triggered.append("No adverse weather — no urgency adjustment.")
+
     # --- Decision Logic (Rule Engine) ---
-    recommendation = "Monitor" # Default recommendation
+    recommendation = "Monitor"  # Default recommendation
 
     if urgency_score >= 1.0 and demand_score > 0:
         recommendation = "Bulk Order"
         rules_triggered.append("RULE: Critical urgency and positive demand trigger BULK ORDER.")
     elif demand_score > 0.4:
-        if cost_impact_score < -0.6: # Corresponds to >15% tariff
+        if cost_impact_score < -0.6:
             recommendation = "Use Substitute"
             rules_triggered.append("RULE: High demand but very high cost triggers USE SUBSTITUTE.")
-        elif cost_impact_score < -0.2: # Corresponds to >5% tariff
+        elif cost_impact_score < -0.2:
             recommendation = "Standard Order"
             rules_triggered.append("RULE: High demand with moderate cost triggers STANDARD ORDER.")
         else:
             recommendation = "Bulk Order"
             rules_triggered.append("RULE: High demand with low cost triggers BULK ORDER.")
-    elif demand_score > -0.4: # Neutral demand
+    elif demand_score > -0.4:  # Neutral demand
         if cost_impact_score < -0.6:
             recommendation = "Hold"
             rules_triggered.append("RULE: Neutral demand with high cost triggers HOLD.")
         elif urgency_score > 0.5:
-             recommendation = "Standard Order"
-             rules_triggered.append("RULE: Neutral demand but medium urgency triggers STANDARD ORDER.")
+            recommendation = "Standard Order"
+            rules_triggered.append("RULE: Neutral demand but medium urgency triggers STANDARD ORDER.")
         else:
             recommendation = "Monitor"
             rules_triggered.append("RULE: Neutral demand with low cost and urgency triggers MONITOR.")
-    else: # Low demand
+    else:  # Low demand
         if cost_impact_score < -0.2:
             recommendation = "Deprioritize"
             rules_triggered.append("RULE: Low demand with any significant cost triggers DEPRIORITIZE.")
@@ -155,13 +161,13 @@ def get_procurement_recommendation(product, tariff_rate, demand_signal):
             recommendation = "Hold"
             rules_triggered.append("RULE: Low demand with low cost triggers HOLD.")
 
-
     analysis_details = {
         "productId": product.get('id'),
         "productName": product.get('name'),
         "inputs": {
             "tariffRate": tariff_rate,
             "demandSignal": demand_signal,
+            "weatherFactor": weather_factor,
             "inventoryLevel": stock,
             "salesVelocity": velocity,
             "daysOfStock": days_of_stock
@@ -174,6 +180,7 @@ def get_procurement_recommendation(product, tariff_rate, demand_signal):
         "rulesTriggered": rules_triggered
     }
 
+    print(f"📊 Final recommendation for {product.get('name')}: {recommendation}")
     return {
         "recommendation": recommendation,
         "analysis": analysis_details

@@ -1,25 +1,25 @@
 {
-  "recommendation": "Use Substitute",
+  "recommendation": "Standard Order",
   "analysis": {
-    "productId": 2,
-    "productName": "Apple iPhone 15",
+    "productId": "prod_001",
+    "productName": "Samsung 65-inch QLED 4K Smart TV",
     "inputs": {
-      "tariffRate": 0.25,
-      "demandSignal": -0.65,
-      "weatherFactor": 0,
-      "inventoryLevel": 45,
-      "salesVelocity": 5
+      "tariffRate": 0.05,
+      "demandSignal": 0.2,
+      "inventoryLevel": 20,
+      "salesVelocity": 4,
+      "daysOfStock": 5.0
     },
     "scores": {
-      "costImpactScore": -0.8,
-      "demandScore": -0.65,
-      "urgencyScore": 0.2
+      "costImpactScore": -0.2,
+      "demandScore": 0.2,
+      "urgencyScore": 1.0
     },
     "rulesTriggered": [
-      "High tariff impacts cost score negatively.",
-      "Negative news sentiment indicates low demand.",
-      "Low sales velocity reduces urgency."
-    ],
-    "substitutes": []
+      "Medium tariff (5%) has moderate cost impact.",
+      "Neutral news sentiment (score: 0.20) indicates stable demand.",
+      "Critically low inventory (5.0 days of stock remaining). High urgency.",
+      "RULE: Neutral demand but medium urgency triggers STANDARD ORDER."
+    ]
   }
 }

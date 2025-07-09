@@ -1,47 +1,242 @@
 [
   {
-    "id": "prod_101",
+    "id": "prod_001",
     "name": "Samsung 65-inch QLED 4K Smart TV",
     "category": "electronics",
     "countryOfOrigin": "Vietnam",
     "supplier": "Samsung Electronics Co., Ltd.",
     "baseCost": 850.00,
-    "features": ["65-inch", "QLED", "4K", "Smart TV", "HDR"]
+    "price": 1099.99,
+    "sku": "SAM65QLED4K",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["65-inch", "QLED", "4K", "Smart TV", "HDR"],
+    "inventory": {
+      "stock": 20,
+      "salesVelocity": 4
+    }
   },
   {
-    "id": "prod_102",
+    "id": "prod_002",
     "name": "LG 65-inch OLED 4K Smart TV",
     "category": "electronics",
     "countryOfOrigin": "Mexico",
     "supplier": "LG Electronics Inc.",
     "baseCost": 920.00,
-    "features": ["65-inch", "OLED", "4K", "Smart TV", "Dolby Vision"]
+    "price": 1179.00,
+    "sku": "LG65OLED4K",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["65-inch", "OLED", "4K", "Smart TV", "Dolby Vision"],
+    "inventory": {
+      "stock": 12,
+      "salesVelocity": 3
+    }
   },
   {
-    "id": "prod_103",
+    "id": "prod_003",
     "name": "Sony 55-inch LED 4K Smart TV",
     "category": "electronics",
     "countryOfOrigin": "China",
     "supplier": "Sony Corporation",
     "baseCost": 780.00,
-    "features": ["55-inch", "LED", "4K", "Smart TV", "HDR"]
+    "price": 1020.00,
+    "sku": "SONY55LED4K",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["55-inch", "LED", "4K", "Smart TV", "HDR"],
+    "inventory": {
+      "stock": 15,
+      "salesVelocity": 2
+    }
   },
   {
-    "id": "prod_201",
+    "id": "prod_004",
+    "name": "Hisense 50-inch UHD TV",
+    "category": "electronics",
+    "countryOfOrigin": "Vietnam",
+    "supplier": "Hisense",
+    "baseCost": 400.00,
+    "price": 520.00,
+    "sku": "HISENSE50UHD",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["50-inch", "LED", "UHD", "Smart TV"],
+    "inventory": {
+      "stock": 10,
+      "salesVelocity": 1.5
+    }
+  },
+  {
+    "id": "prod_005",
+    "name": "TCL 43-inch Smart TV",
+    "category": "electronics",
+    "countryOfOrigin": "China",
+    "supplier": "TCL",
+    "baseCost": 320.00,
+    "price": 420.00,
+    "sku": "TCL43SMART",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["43-inch", "LED", "Smart TV"],
+    "inventory": {
+      "stock": 25,
+      "salesVelocity": 2
+    }
+  },
+  {
+    "id": "prod_006",
     "name": "Men's Cotton T-Shirt (3-Pack)",
     "category": "apparel",
     "countryOfOrigin": "Bangladesh",
     "supplier": "Global Apparel Solutions",
     "baseCost": 12.50,
-    "features": ["Cotton", "Crew Neck", "Short Sleeve", "Machine Washable"]
+    "price": 19.99,
+    "sku": "TSHIRT3PACK",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["Cotton", "Crew Neck", "Short Sleeve", "Machine Washable"],
+    "inventory": {
+      "stock": 50,
+      "salesVelocity": 8
+    }
   },
   {
-    "id": "prod_202",
+    "id": "prod_007",
     "name": "Men's Performance Polo Shirt",
     "category": "apparel",
     "countryOfOrigin": "Vietnam",
     "supplier": "Dynamic Fabrics Inc.",
     "baseCost": 15.00,
-    "features": ["Polyester", "Moisture-Wicking", "Short Sleeve", "UV Protection"]
+    "price": 24.99,
+    "sku": "POLOSHIRT01",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["Polyester", "Moisture-Wicking", "Short Sleeve", "UV Protection"],
+    "inventory": {
+      "stock": 35,
+      "salesVelocity": 6
+    }
+  },
+  {
+    "id": "prod_008",
+    "name": "Men's Winter Jacket",
+    "category": "apparel",
+    "countryOfOrigin": "China",
+    "supplier": "Urban Wear Ltd.",
+    "baseCost": 60.00,
+    "price": 89.99,
+    "sku": "WINTERJACKET",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["Polyester", "Insulated", "Water-resistant"],
+    "inventory": {
+      "stock": 20,
+      "salesVelocity": 1
+    }
+  },
+  {
+    "id": "prod_009",
+    "name": "Women’s Running Shoes",
+    "category": "apparel",
+    "countryOfOrigin": "Vietnam",
+    "supplier": "StrideWell Inc.",
+    "baseCost": 45.00,
+    "price": 69.99,
+    "sku": "WOMRUNSHOE",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["Mesh Upper", "Cushioned", "Lightweight"],
+    "inventory": {
+      "stock": 40,
+      "salesVelocity": 5
+    }
+  },
+  {
+    "id": "prod_010",
+    "name": "Men's Formal Shirt",
+    "category": "apparel",
+    "countryOfOrigin": "India",
+    "supplier": "Textile Hub",
+    "baseCost": 18.00,
+    "price": 29.99,
+    "sku": "FORMALSHIRT01",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["Cotton Blend", "Slim Fit", "Machine Washable"],
+    "inventory": {
+      "stock": 38,
+      "salesVelocity": 4
+    }
+  },
+  {
+    "id": "prod_011",
+    "name": "Canned Tuna (12-Pack)",
+    "category": "Canned Goods",
+    "countryOfOrigin": "USA",
+    "supplier": "American Seafoods Co.",
+    "baseCost": 10.00,
+    "price": 14.99,
+    "sku": "CANNEDTUNA12",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["Canned", "Omega-3", "No Preservatives"],
+    "inventory": {
+      "stock": 75,
+      "salesVelocity": 10
+    }
+  },
+  {
+    "id": "prod_012",
+    "name": "Organic Tomato Sauce (6-Pack)",
+    "category": "Canned Goods",
+    "countryOfOrigin": "USA",
+    "supplier": "Green Harvest Farms",
+    "baseCost": 9.00,
+    "price": 13.99,
+    "sku": "TOMSAUCE6",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["Organic", "Non-GMO", "BPA-Free Can"],
+    "inventory": {
+      "stock": 60,
+      "salesVelocity": 7
+    }
+  },
+  {
+    "id": "prod_013",
+    "name": "Chickpeas (12-Pack)",
+    "category": "Canned Goods",
+    "countryOfOrigin": "USA",
+    "supplier": "Healthy Eats Co.",
+    "baseCost": 8.00,
+    "price": 11.99,
+    "sku": "CHICKPEAS12",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["Canned", "High Protein", "Gluten-Free"],
+    "inventory": {
+      "stock": 80,
+      "salesVelocity": 9
+    }
+  },
+  {
+    "id": "prod_014",
+    "name": "Black Beans (12-Pack)",
+    "category": "Canned Goods",
+    "countryOfOrigin": "USA",
+    "supplier": "Healthy Eats Co.",
+    "baseCost": 8.00,
+    "price": 11.99,
+    "sku": "BLACKBEANS12",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["Canned", "High Fiber", "Gluten-Free"],
+    "inventory": {
+      "stock": 70,
+      "salesVelocity": 8
+    }
+  },
+  {
+    "id": "prod_015",
+    "name": "Baked Beans (6-Pack)",
+    "category": "Canned Goods",
+    "countryOfOrigin": "USA",
+    "supplier": "American Classics Co.",
+    "baseCost": 7.00,
+    "price": 10.99,
+    "sku": "BAKEDBEANS6",
+    "imageUrl": "/placeholder-product.png",
+    "features": ["Canned", "Sweet and Savory", "No Preservatives"],
+    "inventory": {
+      "stock": 50,
+      "salesVelocity": 6
+    }
   }
 ]

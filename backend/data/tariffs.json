@@ -1,12 +1,22 @@
 {
   "China": {
-    "Electronics": 0.25,
-    "Apparel": 0.15
+    "electronics": 0.25,
+    "apparel": 0.15
   },
   "Vietnam": {
-    "Apparel": 0.10
+    "apparel": 0.10,
+    "electronics": 0.05
   },
   "USA": {
     "Canned Goods": 0.00
+  },
+  "Mexico": {
+    "electronics": 0.08
+  },
+  "India": {
+    "apparel": 0.12
+  },
+  "Bangladesh": {
+    "apparel": 0.07
   }
 }

@@ -15,6 +15,7 @@ def get_local_weather():
     Fetches current weather for a fixed location.
     """
     if not OPENWEATHER_API_KEY:
+        print("✗ OpenWeather API key is missing.")
         return {"error": "OpenWeather API key is not configured."}
 
     params = {
@@ -27,6 +28,20 @@ def get_local_weather():
     try:
         response = requests.get(WEATHER_API_URL, params=params)
         response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException as err:
-        return {"error": f"An error occurred: {err}"}
+        weather_data = response.json()
+
+        condition = weather_data['weather'][0]['main'].lower()
+        print(f"🌦️ Weather condition: {condition}")
+
+        # Basic mapping to "weatherFactor"
+        bad_weather = ['rain', 'snow', 'storm', 'fog']
+        factor = 1.0 if any(word in condition for word in bad_weather) else 0.0
+
+        return {
+            "weatherFactor": factor,
+            "source": condition
+        }
+
+    except Exception as e:
+        print(f"⚠️ Weather fetch failed: {e}")
+        return {"weatherFactor": 0.0, "source": "error"}

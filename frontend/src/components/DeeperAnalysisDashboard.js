@@ -1,6 +1,6 @@
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
-import ReactJson from '@uiw/react-json-view'; // Using compatible version
+import ReactJson from '@uiw/react-json-view';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,7 +12,6 @@ import {
 } from 'chart.js';
 import './DeeperAnalysisDashboard.css';
 
-// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -29,7 +28,6 @@ const DeeperAnalysisDashboard = ({ analysisData }) => {
 
   const { scores, inputs, rulesTriggered } = analysisData;
 
-  // Extract factor names and values for the chart
   const factors = Object.keys(scores);
   const values = Object.values(scores);
 
@@ -99,8 +97,24 @@ const DeeperAnalysisDashboard = ({ analysisData }) => {
             <Bar options={chartOptions} data={chartData} />
           </div>
         </div>
-        
+
         <div className="json-container">
+          {inputs && (
+            <div className="inputs-section">
+              <h4>📥 Input Factors</h4>
+              <ul>
+                <li><strong>Tariff Rate:</strong> {(inputs?.tariffRate * 100).toFixed(1)}%</li>
+                <li><strong>Demand Signal:</strong> {inputs?.demandSignal?.toFixed(2)}</li>
+                <li><strong>Inventory Level:</strong> {inputs?.inventoryLevel}</li>
+                <li><strong>Sales Velocity:</strong> {inputs?.salesVelocity}</li>
+                <li><strong>Days of Stock:</strong> {inputs?.daysOfStock?.toFixed(1)}</li>
+                <li>
+                  <strong>Weather Factor:</strong> {inputs?.weatherFactor}{' '}
+                  {inputs?.weatherFactor > 0 ? '⚠️ Bad Weather' : '✔️ Normal'}
+                </li>
+              </ul>
+            </div>
+          )}
           <h4>Engine Inputs</h4>
           <ReactJson 
             src={inputs} 
@@ -112,7 +126,7 @@ const DeeperAnalysisDashboard = ({ analysisData }) => {
             style={{ padding: '12px', borderRadius: '4px' }}
           />
         </div>
-        
+
         <div className="rules-container">
           <h4>Rules Triggered ({rulesTriggered.length})</h4>
           <ul>
@@ -124,6 +138,19 @@ const DeeperAnalysisDashboard = ({ analysisData }) => {
           </ul>
         </div>
       </div>
+
+      {analysisData.substitutes && analysisData.substitutes.length > 0 && (
+        <div className="substitute-section">
+          <h3>🛍️ Suggested Substitutes</h3>
+          <ul className="substitute-list">
+            {analysisData.substitutes.map((item, index) => (
+              <li key={item.id} className="substitute-item">
+                <strong>{item.name}</strong> (SKU: {item.sku}) – Similarity: {item.similarity}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

@@ -241,9 +241,18 @@ function App() {
     if (error && !selectedProduct) {
       return renderError();
     }
-    
+    if (selectedProduct && loading.analysis) {
+      return (
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          ⏳ Analyzing <strong>{selectedProduct.name || 'product'}</strong>...
+        </div>
+      );
+    }
+
     // Show product detail view
     if (selectedProduct) {
+      // ✅ ADDITION: safety check & logging
+      console.log('🟡 Selected product:', selectedProduct);
       return (
         <ProductDetail 
           product={selectedProduct} 

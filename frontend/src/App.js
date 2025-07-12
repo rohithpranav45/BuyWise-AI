@@ -2,334 +2,151 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import ProductList from './components/ProductList';
 import ProductDetail from './components/ProductDetail';
-import { fetchProducts, analyzeProduct, healthCheck } from './api/client';
+import Placeholder from './components/Placeholder'; // Import the placeholder for better loading
+import { fetchProducts, analyzeProduct, healthCheck, fetchSubstitutes } from './api/client';
 import './App.css';
 
 function App() {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [loading, setLoading] = useState({
-    products: true,
-    analysis: false,
-    health: false
-  });
+  const [loading, setLoading] = useState({ products: true, analysis: false });
   const [error, setError] = useState(null);
   const [serverHealth, setServerHealth] = useState(null);
 
-  // Enhanced error handling with user-friendly messages
+  // --- FEATURE RESTORED: Full Error Handling ---
   const handleError = (error, context) => {
     console.error(`Error in ${context}:`, error);
-    
-    let userMessage = 'Something went wrong. Please try again.';
-    
-    if (error.userMessage) {
-      userMessage = error.userMessage;
-    } else if (error.isNetworkError) {
-      userMessage = 'Cannot connect to server. Please check your internet connection and try again.';
-    } else if (error.isTimeout) {
-      userMessage = 'Request timed out. The server might be starting up, please try again in a moment.';
-    } else if (error.message) {
-      userMessage = error.message;
-    }
-    
+    // Use the detailed error message from the API client if it exists
+    const userMessage = error.userMessage || error.message || 'An unexpected error occurred. Please try again.';
     setError(userMessage);
-    return userMessage;
   };
 
-  // Health check function
   const checkServerHealth = useCallback(async () => {
     try {
-      setLoading(prev => ({ ...prev, health: true }));
       const health = await healthCheck();
       setServerHealth(health);
-      console.log('✅ Server health check passed');
+      console.log('✅ Server health check passed:', health);
     } catch (error) {
       console.error('❌ Server health check failed:', error);
       setServerHealth({ status: 'error', message: 'Server unavailable' });
-    } finally {
-      setLoading(prev => ({ ...prev, health: false }));
     }
   }, []);
 
-  // Memoized fetch function with enhanced error handling
   const fetchProductsData = useCallback(async () => {
     try {
       setError(null);
       setLoading(prev => ({ ...prev, products: true }));
-      
-      console.log('🔄 Starting to fetch products...');
       const response = await fetchProducts();
-      
-      if (!response?.data) {
-        throw new Error('No product data received from server');
-      }
-      
+      setProducts(response.data || []);
       console.log(`✅ Successfully loaded ${response.data.length} products`);
-      setProducts(response.data);
-      
     } catch (error) {
-      const errorMessage = handleError(error, 'fetchProducts');
-      setProducts([]);
-      
-      // If it's a network error, also check server health
-      if (error.isNetworkError) {
-        checkServerHealth();
-      }
-      
+      handleError(error, 'fetchProducts');
     } finally {
       setLoading(prev => ({ ...prev, products: false }));
     }
-  }, [checkServerHealth]);
+  }, []);
 
-  // Initial data loading
   useEffect(() => {
-    let isMounted = true;
-    
-    const loadData = async () => {
-      if (isMounted) {
-        // First check server health
-        await checkServerHealth();
-        // Then fetch products
-        await fetchProductsData();
-      }
-    };
+    checkServerHealth();
+    fetchProductsData();
+  }, [checkServerHealth, fetchProductsData]);
 
-    loadData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [fetchProductsData, checkServerHealth]);
-
-  // Enhanced product selection with better error handling
   const handleProductSelect = async (product) => {
-    console.log("📥 handleProductSelect called with:", product);
-    console.log("✅ Product.name:", product.name);
-    console.log("✅ Product.id:", product.id);
     if (!product || !product.id) {
-      console.warn("❌ Invalid product selected:", product);
-      setError('Invalid product selected');
+      handleError({ message: 'Invalid product selected.' }, 'handleProductSelect');
       return;
     }
     
     setSelectedProduct(product);
     setLoading(prev => ({ ...prev, analysis: true }));
-    setAnalysisResult(null);
+    setAnalysisResult(null); // Clear previous results
     setError(null);
 
     try {
-      console.log(`🔍 Starting analysis for product: ${product.name} (${product.id})`);
-      const response = await analyzeProduct(product.id);
+      const analysisResponse = await analyzeProduct(product.id);
+      const substitutesResponse = await fetchSubstitutes(product.id);
       
-      if (!response?.data) {
-        throw new Error('No analysis data received');
-      }
-      
-      console.log('✅ Analysis completed successfully');
-      setAnalysisResult(response.data);
-      
+      const combinedResult = {
+        ...analysisResponse.data,
+        analysis: {
+          ...analysisResponse.data.analysis,
+          substitutes: substitutesResponse.data || []
+        }
+      };
+
+      setAnalysisResult(combinedResult);
+      console.log('✅ Analysis and substitutes fetched successfully');
     } catch (error) {
-      const errorMessage = handleError(error, 'analyzeProduct');
-      
-      // Set fallback analysis result for better UX
-      setAnalysisResult({ 
-        recommendation: 'Error', 
-        analysis: { 
-          rulesTriggered: [
-            'Analysis failed',
-            `Error: ${errorMessage}`,
-            'Please try again or contact support'
-          ],
-          summary: 'Unable to complete analysis at this time'
-        },
-        error: true,
-        errorMessage: errorMessage
-      });
-      
+      handleError(error, 'analyzeProduct');
     } finally {
       setLoading(prev => ({ ...prev, analysis: false }));
     }
   };
 
-  // Navigate back to product list
   const handleBackToProducts = useCallback(() => {
     setSelectedProduct(null);
     setAnalysisResult(null);
     setError(null);
   }, []);
-
-  // Retry function for failed operations
+  
+  // --- FEATURE RESTORED: Retry Logic ---
   const handleRetry = useCallback(() => {
     setError(null);
     if (selectedProduct) {
+      // If we were on a detail page, re-run the analysis
       handleProductSelect(selectedProduct);
     } else {
+      // If we were on the list page, re-fetch the products
       fetchProductsData();
     }
-  }, [selectedProduct, fetchProductsData]);
+  }, [selectedProduct, fetchProductsData, handleProductSelect]);
 
-  // Render error state with retry option
-  const renderError = () => {
-    if (!error) return null;
-    
-    return (
-      <div className="error-container" style={{
-        padding: '20px',
-        margin: '20px',
-        backgroundColor: '#fee',
-        border: '1px solid #fcc',
-        borderRadius: '8px',
-        textAlign: 'center'
-      }}>
-        <h3 style={{ color: '#c33', marginBottom: '10px' }}>
-          ⚠️ Something went wrong
-        </h3>
-        <p style={{ color: '#666', marginBottom: '15px' }}>
-          {error}
-        </p>
-        <button 
-          onClick={handleRetry}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          🔄 Try Again
-        </button>
-        {serverHealth?.status === 'error' && (
-          <p style={{ color: '#999', marginTop: '10px', fontSize: '14px' }}>
-            Server Status: {serverHealth.message}
-          </p>
-        )}
-      </div>
-    );
-  };
 
-  // Render loading state
-  const renderLoading = () => {
-    if (!loading.products) return null;
-    
-    return (
-      <div className="loading-container" style={{
-        padding: '40px',
-        textAlign: 'center'
-      }}>
-        <div style={{ fontSize: '24px', marginBottom: '10px' }}>
-          ⏳ Loading...
-        </div>
-        <p style={{ color: '#666' }}>
-          {loading.health ? 'Checking server status...' : 'Fetching products...'}
-        </p>
-        {serverHealth?.status === 'ok' && (
-          <p style={{ color: '#28a745', fontSize: '14px' }}>
-            ✅ Server is healthy
-          </p>
-        )}
-      </div>
-    );
-  };
-
-  // Main content renderer
+  // --- FEATURE RESTORED: Detailed Rendering Logic ---
   const renderContent = () => {
-    // Show loading state
+    // Show skeleton placeholder while products are loading initially
     if (loading.products) {
-      return renderLoading();
+      return <Placeholder count={12} />;
     }
-    
-    // Show error state
+
+    // Show a full-page error message if loading products failed
     if (error && !selectedProduct) {
-      return renderError();
-    }
-    if (selectedProduct && loading.analysis) {
       return (
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          ⏳ Analyzing <strong>{selectedProduct.name || 'product'}</strong>...
+        <div className="error-message">
+          <p>⚠️ {error}</p>
+          <button onClick={handleRetry} className="retry-button">🔄 Try Again</button>
         </div>
       );
     }
-
-    // Show product detail view
+    
+    // Show the Product Detail view
     if (selectedProduct) {
-      // ✅ ADDITION: safety check & logging
-      console.log('🟡 Selected product:', selectedProduct);
       return (
         <ProductDetail 
           product={selectedProduct} 
           analysis={analysisResult}
-          isLoading={loading.analysis}
+          isLoading={loading.analysis} // Pass loading state to show spinner inside the component
           onBack={handleBackToProducts}
-          error={error}
-          onRetry={handleRetry}
         />
       );
     }
-
-    // Show product list
-    return (
-      <ProductList 
-        products={products} 
-        onProductSelect={handleProductSelect}
-        isLoading={loading.products}
-        error={error}
-        onRetry={handleRetry}
-      />
-    );
-  };
-
-  // Debug info (only in development)
-  const renderDebugInfo = () => {
-    if (process.env.NODE_ENV === 'production') return null;
     
-    return (
-      <div style={{
-        position: 'fixed',
-        bottom: '10px',
-        right: '10px',
-        backgroundColor: '#f8f9fa',
-        padding: '10px',
-        borderRadius: '4px',
-        fontSize: '12px',
-        border: '1px solid #dee2e6'
-      }}>
-        <div>📊 Debug Info:</div>
-        <div>Products: {products.length}</div>
-        <div>Selected: {selectedProduct?.name || 'None'}</div>
-        <div>Server: {serverHealth?.status || 'Unknown'}</div>
-        <div>API: {process.env.REACT_APP_API_BASE_URL || 'Default'}</div>
-      </div>
-    );
+    // Show the Product List
+    return <ProductList products={products} onProductSelect={handleProductSelect} />;
   };
 
   return (
     <div className="app-container">
       <Header />
-      <main className="main-content">
+      {/* 
+        --- THE CRITICAL BUG FIX ---
+        This 'key' prop forces a full re-render when switching views,
+        preventing the Chart.js 'removeChild' error.
+      */}
+      <main className="main-content" key={selectedProduct ? selectedProduct.id : 'product-list'}>
         {renderContent()}
       </main>
-      {renderDebugInfo()}
-      {/* ✅ Emergency Debug Overlay */}
-      {process.env.NODE_ENV === "development" && selectedProduct && (
-        <div style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: 'rgba(0,0,0,0.8)',
-          color: '#fff',
-          padding: '8px',
-          zIndex: 9999,
-          fontFamily: 'monospace',
-          maxHeight: '40vh',
-          overflowY: 'auto'
-        }}>
-          Debug: Selected → <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(selectedProduct, null, 2)}</pre>
-        </div>
-      )}
     </div>
   );
 }

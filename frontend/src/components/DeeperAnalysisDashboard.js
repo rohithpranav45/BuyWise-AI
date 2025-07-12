@@ -1,5 +1,6 @@
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
+// Correctly import from the library we installed
 import ReactJson from '@uiw/react-json-view';
 import {
   Chart as ChartJS,
@@ -12,6 +13,7 @@ import {
 } from 'chart.js';
 import './DeeperAnalysisDashboard.css';
 
+// Register Chart.js components - this is correct
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -22,35 +24,32 @@ ChartJS.register(
 );
 
 const DeeperAnalysisDashboard = ({ analysisData }) => {
+  // A safe fallback if no data is available yet
   if (!analysisData) {
-    return <p>No analysis data available.</p>;
+    return (
+      <div className="deeper-analysis-dashboard">
+        <h3>Deeper Analysis</h3>
+        <p>Awaiting analysis data...</p>
+      </div>
+    );
   }
 
-  const { scores, inputs, rulesTriggered } = analysisData;
-
-  const factors = Object.keys(scores);
-  const values = Object.values(scores);
+  // Destructure with safe fallbacks
+  const { 
+    scores = {}, 
+    inputs = {}, 
+    rulesTriggered = [],
+    substitutes = []
+  } = analysisData;
 
   const chartData = {
-    labels: factors,
+    labels: Object.keys(scores),
     datasets: [
       {
         label: 'Score',
-        data: values,
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.7)',
-          'rgba(54, 162, 235, 0.7)',
-          'rgba(255, 206, 86, 0.7)',
-          'rgba(75, 192, 192, 0.7)',
-          'rgba(153, 102, 255, 0.7)',
-        ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-        ],
+        data: Object.values(scores),
+        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+        borderColor: 'rgba(54, 162, 235, 1)',
         borderWidth: 1,
       },
     ],
@@ -59,32 +58,10 @@ const DeeperAnalysisDashboard = ({ analysisData }) => {
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: {
-        display: false,
-      },
-      title: {
-        display: true,
-        text: 'Decision Factor Scores',
-        font: {
-          size: 16,
-        },
-      },
-      tooltip: {
-        callbacks: {
-          label: (context) => `${context.parsed.y.toFixed(2)}`,
-        },
-      },
+      legend: { display: false },
+      title: { display: true, text: 'Decision Factor Scores' },
     },
-    scales: {
-      y: {
-        beginAtZero: false,
-        min: -1,
-        max: 1,
-        ticks: {
-          stepSize: 0.5,
-        },
-      },
-    },
+    scales: { y: { beginAtZero: false, min: -1, max: 1 } },
   };
 
   return (
@@ -93,32 +70,17 @@ const DeeperAnalysisDashboard = ({ analysisData }) => {
       <div className="dashboard-grid">
         <div className="chart-container">
           <h4>Factor Scores</h4>
-          <div className="chart-wrapper">
-            <Bar options={chartOptions} data={chartData} />
-          </div>
+          <Bar options={chartOptions} data={chartData} />
         </div>
-
         <div className="json-container">
-          {inputs && (
-            <div className="inputs-section">
-              <h4>📥 Input Factors</h4>
-              <ul>
-                <li><strong>Tariff Rate:</strong> {(inputs?.tariffRate * 100).toFixed(1)}%</li>
-                <li><strong>Demand Signal:</strong> {inputs?.demandSignal?.toFixed(2)}</li>
-                <li><strong>Inventory Level:</strong> {inputs?.inventoryLevel}</li>
-                <li><strong>Sales Velocity:</strong> {inputs?.salesVelocity}</li>
-                <li><strong>Days of Stock:</strong> {inputs?.daysOfStock?.toFixed(1)}</li>
-                <li>
-                  <strong>Weather Factor:</strong> {inputs?.weatherFactor}{' '}
-                  {inputs?.weatherFactor > 0 ? '⚠️ Bad Weather' : '✔️ Normal'}
-                </li>
-              </ul>
-            </div>
-          )}
           <h4>Engine Inputs</h4>
+          {/* 
+            --- THE CRITICAL FIX ---
+            The @uiw/react-json-view library uses the 'value' prop, not 'src'.
+            We also provide a fallback object to prevent any possible crash.
+          */}
           <ReactJson 
-            src={inputs} 
-            name={false}
+            value={inputs || { status: "No data" }}
             theme="monokai"
             collapsed={1}
             displayDataTypes={false}
@@ -126,31 +88,26 @@ const DeeperAnalysisDashboard = ({ analysisData }) => {
             style={{ padding: '12px', borderRadius: '4px' }}
           />
         </div>
-
         <div className="rules-container">
           <h4>Rules Triggered ({rulesTriggered.length})</h4>
           <ul>
             {rulesTriggered.map((rule, index) => (
-              <li key={index} className="rule-item">
-                <span className="rule-bullet">•</span> {rule}
+              <li key={index} className={rule.startsWith('RULE:') ? 'rule-item rule-highlight' : 'rule-item'}>
+                {rule}
               </li>
             ))}
           </ul>
         </div>
+        {/* Adds the substitutes display back in */}
+        {substitutes && substitutes.length > 0 && (
+          <div className="substitute-section">
+            <h4>🛍️ Suggested Substitutes</h4>
+            <ul className="substitute-list">
+              {substitutes.map(item => <li key={item.id} className="substitute-item"><strong>{item.name}</strong> (Similarity: {(item.similarity * 100).toFixed(0)}%)</li>)}
+            </ul>
+          </div>
+        )}
       </div>
-
-      {analysisData.substitutes && analysisData.substitutes.length > 0 && (
-        <div className="substitute-section">
-          <h3>🛍️ Suggested Substitutes</h3>
-          <ul className="substitute-list">
-            {analysisData.substitutes.map((item, index) => (
-              <li key={item.id} className="substitute-item">
-                <strong>{item.name}</strong> (SKU: {item.sku}) – Similarity: {item.similarity}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 };

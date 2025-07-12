@@ -161,23 +161,28 @@ export const analyzeProduct = async (productId) => {
     
     const analysis = response.data;
     
-    // Ensure required fields exist
+    // Ensure the main 'recommendation' key exists
     if (!analysis.recommendation) {
       throw new Error('Invalid analysis response - missing recommendation');
     }
     
-    if (!analysis.analysis || !analysis.analysis.summary) {
+    // --- THIS IS THE CORRECTED VALIDATION ---
+    // We check for 'rulesTriggered' which is always present in a valid response,
+    // instead of the non-existent 'summary' key.
+    if (!analysis.analysis || !analysis.analysis.rulesTriggered) {
       throw new Error('Invalid analysis response - missing analysis details');
     }
     
-    console.log(`🔍 Analysis completed for product ${productId}`);
+    console.log(`✅ Analysis completed for product ${productId}`);
     return { data: analysis };
     
   } catch (error) {
     console.error('❌ Failed to analyze product:', error);
+    // Re-throw the error so the calling component (App.js) can handle it
     throw error;
   }
 };
+
 
 export const fetchSubstitutes = async (productId) => {
   try {

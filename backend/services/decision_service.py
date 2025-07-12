@@ -1,79 +1,84 @@
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.preprocessing import StandardScaler
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+import numpy as np
 
 def find_substitutes(target_product_id, all_products):
     """
-    Finds similar products based on their features using cosine similarity.
+    Finds similar products based on their features using a more robust pipeline.
     """
     if not all_products:
-        return
+        return []
 
-    # Create a DataFrame from the product list
     df = pd.DataFrame(all_products)
 
-    # Extract nested feature and inventory data
-    features_df = pd.json_normalize(df['features'])
-    inventory_df = pd.json_normalize(df['inventory'])
-    df = pd.concat([df.drop(['features', 'inventory', 'imageUrl'], axis=1), features_df, inventory_df], axis=1)
+    # --- Preprocessing ---
+    # Ensure all products have an inventory dictionary
+    df['inventory'] = df['inventory'].apply(lambda x: x if isinstance(x, dict) else {'stock': 0, 'salesVelocity': 0})
+    
+    # Create a string from the list of features for vectorization
+    df['features_str'] = df['features'].apply(lambda x: ' '.join(x) if isinstance(x, list) else '')
 
     # --- Feature Engineering ---
-    # Select features for similarity calculation
-    features_for_similarity = ['category', 'price', 'type', 'size_oz', 'brand']
+    # Define which columns to use for different transformations
+    numerical_features = ['baseCost', 'price']
+    categorical_features = ['category']
+    text_features = 'features_str'
     
-    # Create a dataframe with only the features we need, and handle missing values
-    df_features = df[['id'] + features_for_similarity].copy()
-    df_features.set_index('id', inplace=True)
+    # Create preprocessing pipelines for each data type
+    numerical_transformer = StandardScaler()
+    categorical_transformer = OneHotEncoder(handle_unknown='ignore')
+    text_transformer = TfidfVectorizer(stop_words='english')
 
-    # One-Hot Encode categorical features
-    categorical_cols = df_features.select_dtypes(include=['object', 'category']).columns
-    df_encoded = pd.get_dummies(df_features, columns=categorical_cols, dummy_na=True)
-
-    # Scale numerical features
-    numerical_cols = df_encoded.select_dtypes(include=['number']).columns
-    scaler = StandardScaler()
-    df_encoded[numerical_cols] = scaler.fit_transform(df_encoded[numerical_cols])
+    # Create a preprocessor object using ColumnTransformer
+    # This applies the right transformation to the right column
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('num', numerical_transformer, numerical_features),
+            ('cat', categorical_transformer, categorical_features),
+            ('text', text_transformer, text_features)
+        ],
+        remainder='drop' # Drop other columns
+    )
 
     # --- Cosine Similarity Calculation ---
-    cosine_sim_matrix = cosine_similarity(df_encoded, df_encoded)
+    # Fit and transform the data
+    try:
+        feature_matrix = preprocessor.fit_transform(df)
+    except Exception as e:
+        print(f"✗ Error during feature matrix creation: {e}")
+        return [] # Return empty if processing fails
+
+    cosine_sim_matrix = cosine_similarity(feature_matrix)
     
-    # Create a mapping from product ID to its index in the dataframe
-    id_to_idx = pd.Series(df_encoded.index)
-    indices = pd.Series(df_encoded.index, index=df_encoded.index).drop_duplicates()
+    # Create a mapping from product ID to its index
+    id_to_idx = pd.Series(range(len(df)), index=df.id)
     
     try:
-        target_idx = indices[target_product_id]
+        target_idx = id_to_idx[target_product_id]
     except KeyError:
-        return # Target product not found
+        print(f"⚠️ Target product {target_product_id} not found in index.")
+        return []
 
-    # Get the pairwise similarity scores for the target product
     sim_scores = list(enumerate(cosine_sim_matrix[target_idx]))
-    
-    # Sort the products based on the similarity scores
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-    
-    # Get the scores of the top 3 most similar products (excluding itself, which is at index 0)
-    sim_scores = sim_scores[1:4]
-    
-    # Get the product indices
-    product_indices = [i[0] for i in sim_scores]
-    
-    # Get the actual product IDs from the indices
-    similar_product_ids = id_to_idx.iloc[product_indices].tolist()
+    sim_scores = sim_scores[1:4] # Get top 3, excluding self
 
     # Format the output
     substitutes = []
-    for i, score in zip(similar_product_ids, sim_scores):
-        substitute_product = df[df['id'] == i].to_dict('records')
-        if substitute_product:
-            substitute_product = substitute_product[0]
+    for idx, score in sim_scores:
+        if score > 0.1: # Only add if similarity is above a certain threshold
+            substitute_product = df.iloc[idx]
             substitutes.append({
                 "id": substitute_product['id'],
                 "name": substitute_product['name'],
                 "sku": substitute_product['sku'],
-                "similarity": round(score[1], 2)
+                "similarity": round(score, 2)
             })
-        
+            
     return substitutes
 
 def get_procurement_recommendation(product, tariff_rate, demand_signal, weather_factor=0.0):

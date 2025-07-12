@@ -1,20 +1,82 @@
 .product-list-item {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
-  text-align: center;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
   cursor: pointer;
-  transition: box-shadow 0.3s ease-in-out;
+  transition: var(--transition-base);
+  background-color: var(--bg-white);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Important for the image container */
 }
 
 .product-list-item:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+  border-color: var(--primary-blue);
+}
+
+.product-image-container {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  background-color: #ffffff; /* Ensures product images on transparent bg look good */
+  border-bottom: 1px solid var(--border-color);
 }
 
 .product-image {
   width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  height: 100%;
+  object-fit: contain; /* 'contain' is better for showing full products */
+  padding: var(--base-spacing);
+  box-sizing: border-box; /* Important for padding to work correctly */
+}
+
+.product-status-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+  z-index: 1; /* Ensures badge is on top of the image */
+}
+
+/* Colors for the badge text and background from our theme */
+.product-status-badge.bulk-order { background-color: var(--color-success); }
+.product-status-badge.standard-order { background-color: var(--color-info); }
+.product-status-badge.use-substitute { background-color: var(--color-orange); }
+.product-status-badge.hold { background-color: var(--color-warning); color: var(--text-primary); }
+.product-status-badge.monitor { background-color: var(--color-secondary); }
+.product-status-badge.deprioritize { background-color: var(--color-danger); }
+.product-status-badge.unknown { background-color: #ccc; color: var(--text-primary); }
+.product-status-badge.error { background-color: var(--text-primary); }
+
+
+.product-item-info {
+  padding: 16px;
+  text-align: left;
+  flex-grow: 1; /* Ensures this part expands to fill space */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product-item-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+  color: var(--text-primary);
+  /* Set a fixed height that fits 2 lines of text to prevent layout shifts */
+  min-height: 42px; 
+}
+
+.product-item-info p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 4px 0 0 0;
 }

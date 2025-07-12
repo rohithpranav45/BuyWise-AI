@@ -1,0 +1,52 @@
+.dashboard-summary {
+  background-color: var(--bg-white);
+  padding: var(--card-padding);
+  border-radius: var(--border-radius);
+  margin-bottom: 25px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.summary-title {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.summary-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filter-badge {
+  border: 1px solid var(--border-color);
+  background-color: transparent;
+  color: var(--text-secondary);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: var(--transition-base);
+}
+
+.filter-badge:hover {
+  background-color: var(--bg-light);
+  border-color: #cdd5df;
+}
+
+.filter-badge.active {
+  color: white;
+  border-color: transparent;
+}
+
+.filter-badge.all.active { background-color: #495057; }
+.filter-badge.bulk-order.active { background-color: var(--color-success); }
+.filter-badge.standard-order.active { background-color: var(--color-info); }
+.filter-badge.use-substitute.active { background-color: var(--color-orange); }
+.filter-badge.hold.active { background-color: var(--color-warning); color: var(--text-primary); }
+.filter-badge.monitor.active { background-color: var(--color-secondary); }
+.filter-badge.deprioritize.active { background-color: var(--color-danger); }
+.filter-badge.error.active { background-color: var(--text-primary); }

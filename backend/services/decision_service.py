@@ -83,15 +83,12 @@ def find_substitutes(target_product_id, all_products):
 
 def get_procurement_recommendation(product, tariff_rate, demand_signal, weather_factor=0.0):
     """
-    Analyzes various factors and returns a procurement recommendation using a rule-based engine.
+    Analyzes various factors and returns a procurement recommendation using a corrected, rule-based engine.
     """
     rules_triggered = []
     
-    # --- Scoring Logic ---
-    # Normalize inputs into scores from -1.0 to 1.0
-
-    # Cost Impact Score: Higher tariff means more negative impact
-    cost_impact_score = -1 * (tariff_rate / 0.25)  # Normalize based on a max expected tariff of 25%
+    # --- Scoring Logic (No changes here) ---
+    cost_impact_score = -1 * (tariff_rate / 0.25)
     if tariff_rate > 0.15:
         rules_triggered.append(f"High tariff ({tariff_rate:.0%}) negatively impacts cost score.")
     elif tariff_rate > 0.05:
@@ -99,7 +96,6 @@ def get_procurement_recommendation(product, tariff_rate, demand_signal, weather_
     else:
         rules_triggered.append("Low or zero tariff has minimal cost impact.")
 
-    # Demand Score is already between -1 and 1
     demand_score = demand_signal
     if demand_score > 0.4:
         rules_triggered.append(f"Strong positive news sentiment (score: {demand_score:.2f}) indicates high demand.")
@@ -108,10 +104,9 @@ def get_procurement_recommendation(product, tariff_rate, demand_signal, weather_
     else:
         rules_triggered.append(f"Neutral news sentiment (score: {demand_score:.2f}) indicates stable demand.")
 
-    # Urgency Score: based on inventory vs. sales velocity
     inventory = product.get('inventory', {})
     stock = inventory.get('stock', 0)
-    velocity = inventory.get('salesVelocity', 1)  # Avoid division by zero
+    velocity = inventory.get('salesVelocity', 1)
     days_of_stock = stock / velocity if velocity > 0 else float('inf')
     
     urgency_score = 0
@@ -125,46 +120,61 @@ def get_procurement_recommendation(product, tariff_rate, demand_signal, weather_
         urgency_score = -0.5
         rules_triggered.append(f"Sufficient inventory ({days_of_stock:.1f} days of stock remaining). Low urgency.")
 
-    # Weather adjustment (experimental logic)
     if weather_factor >= 1.0:
         urgency_score += 0.2
         rules_triggered.append("Bad weather detected — slightly increasing urgency score.")
-    elif weather_factor <= 0:
-        rules_triggered.append("No adverse weather — no urgency adjustment.")
 
-    # --- Decision Logic (Rule Engine) ---
+
+    # --- vvvvvv NEW AND CORRECTED DECISION LOGIC vvvvvv ---
+    
     recommendation = "Monitor"  # Default recommendation
 
-    if urgency_score >= 1.0 and demand_score > 0:
+    # RULE 1: First, check for prohibitively high costs.
+    # A very high cost should immediately suggest finding a substitute, unless inventory is so low we have no choice.
+    if cost_impact_score < -0.8: # Corresponds to a tariff > 20%
+        recommendation = "Use Substitute"
+        rules_triggered.append("RULE: Extremely high cost from tariffs triggers USE SUBSTITUTE.")
+    
+    # RULE 2: The perfect storm for a bulk order - urgent, in-demand, AND affordable.
+    elif urgency_score >= 1.0 and demand_score > 0.2 and cost_impact_score > -0.6:
         recommendation = "Bulk Order"
-        rules_triggered.append("RULE: Critical urgency and positive demand trigger BULK ORDER.")
+        rules_triggered.append("RULE: Critical urgency, positive demand AND acceptable cost trigger BULK ORDER.")
+        
+    # RULE 3: High demand is a strong signal, but let's check cost.
     elif demand_score > 0.4:
-        if cost_impact_score < -0.6:
+        if cost_impact_score < -0.6: # High demand, but high cost
             recommendation = "Use Substitute"
             rules_triggered.append("RULE: High demand but very high cost triggers USE SUBSTITUTE.")
-        elif cost_impact_score < -0.2:
+        elif cost_impact_score < -0.2: # High demand, moderate cost
             recommendation = "Standard Order"
             rules_triggered.append("RULE: High demand with moderate cost triggers STANDARD ORDER.")
-        else:
+        else: # High demand, low cost
             recommendation = "Bulk Order"
             rules_triggered.append("RULE: High demand with low cost triggers BULK ORDER.")
+            
+    # RULE 4: Handle neutral demand situations based on urgency and cost.
     elif demand_score > -0.4:  # Neutral demand
-        if cost_impact_score < -0.6:
-            recommendation = "Hold"
-            rules_triggered.append("RULE: Neutral demand with high cost triggers HOLD.")
-        elif urgency_score > 0.5:
+        if urgency_score >= 1.0: # Urgent, neutral demand
             recommendation = "Standard Order"
-            rules_triggered.append("RULE: Neutral demand but medium urgency triggers STANDARD ORDER.")
-        else:
+            rules_triggered.append("RULE: Critical urgency with neutral demand triggers STANDARD ORDER.")
+        elif urgency_score >= 0.5: # Medium urgency, neutral demand
             recommendation = "Monitor"
-            rules_triggered.append("RULE: Neutral demand with low cost and urgency triggers MONITOR.")
-    else:  # Low demand
-        if cost_impact_score < -0.2:
-            recommendation = "Deprioritize"
-            rules_triggered.append("RULE: Low demand with any significant cost triggers DEPRIORITIZE.")
-        else:
+            rules_triggered.append("RULE: Medium urgency with neutral demand triggers MONITOR.")
+        else: # Low urgency, neutral demand
             recommendation = "Hold"
-            rules_triggered.append("RULE: Low demand with low cost triggers HOLD.")
+            rules_triggered.append("RULE: Low urgency with neutral demand triggers HOLD.")
+            
+    # RULE 5: Handle low demand situations.
+    else:  # Low demand
+        if urgency_score >= 0.5: # Low demand but still somewhat urgent
+            recommendation = "Monitor"
+            rules_triggered.append("RULE: Low demand but medium urgency triggers MONITOR.")
+        else: # Low demand and low urgency
+            recommendation = "Deprioritize"
+            rules_triggered.append("RULE: Low demand with low urgency triggers DEPRIORITIZE.")
+
+    # --- ^^^^^^ END OF NEW LOGIC ^^^^^^ ---
+
 
     analysis_details = {
         "productId": product.get('id'),

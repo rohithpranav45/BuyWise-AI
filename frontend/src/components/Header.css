@@ -1,17 +1,40 @@
 .app-header {
-  background-color: #0071ce; /* Walmart Blue */
-  padding: 20px;
+  background: var(--primary-blue);
+  padding: 20px 40px;
   color: white;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.app-header h1 {
+.header-title {
   margin: 0;
-  font-size: 2.5rem;
 }
 
-.app-header p {
+.header-title h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+}
+
+.header-title .spark {
+  color: var(--spark-yellow);
+  font-size: 2.5rem;
+  margin: 0 8px;
+  line-height: 1;
+}
+
+.header-title p {
   margin: 5px 0 0;
-  font-size: 1rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+.header-status {
+  font-size: 0.9rem;
+  opacity: 0.9;
 }

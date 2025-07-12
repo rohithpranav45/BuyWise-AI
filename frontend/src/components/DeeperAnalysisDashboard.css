@@ -1,136 +1,134 @@
-/* Core Layout */
+/* Main container for the deeper analysis section */
 .deeper-analysis-dashboard {
-  margin-top: 20px;
-  padding: 20px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  margin-top: 24px;
 }
 
-/* Grid System */
+.deeper-analysis-dashboard h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Grid layout for the analysis cards */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
 }
 
-/* Card Styles */
-.chart-container,
-.json-container,
-.rules-container {
-  padding: 15px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  background: white;
+/* Base styles for all "cards" in the dashboard */
+.dashboard-card {
+  padding: var(--card-padding);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--bg-white);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
 }
 
-/* Specific to react-chartjs-2 */
 .chart-container {
   min-height: 300px;
+}
+
+.chart-wrapper {
+  flex-grow: 1;
   position: relative;
 }
 
-/* Specific to @uiw/react-json-view */
-.json-container .w-rjv {
-  padding: 10px;
-  background: #f8f9fa !important;
-  border-radius: 6px;
-  font-size: 13px;
+.dashboard-card h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 0;
+  margin-bottom: 16px;
 }
 
-/* Rules List */
-.rules-container {
-  grid-column: 1 / -1;
-  background: #f8f9fa;
+/* --- vvvvvv NEW AND UPDATED STYLES FOR JSON VIEW vvvvvv --- */
+.json-container {
+  /* Remove padding to allow the wrapper to control it */
+  padding: 0; 
 }
+
+.json-container h4 {
+  /* Add padding back for the header inside the card */
+  padding: var(--card-padding);
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+/* This wrapper provides a clean, inset look */
+.json-view-wrapper {
+  background-color: var(--bg-light);
+  margin: var(--card-padding);
+  border-radius: var(--border-radius);
+  padding: 4px; /* A small padding inside the wrapper */
+  border: 1px solid var(--border-color);
+  flex-grow: 1;
+}
+
+/* Override default styles of the react-json-view component */
+.w-rjv-inner {
+  padding: 0 !important;
+}
+/* --- ^^^^^^ END OF NEW AND UPDATED STYLES ^^^^^^ --- */
 
 .rules-container ul {
   padding-left: 20px;
   margin: 0;
-  list-style-type: none;
+  font-family: 'SF Mono', Menlo, monospace;
+  font-size: 0.85rem;
 }
 
 .rules-container li {
-  margin-bottom: 8px;
-  font-family: 'SF Mono', Menlo, monospace;
-  font-size: 0.85rem;
-  position: relative;
-  padding-left: 20px;
+  margin-bottom: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
 }
 
-.rules-container li:before {
-  content: "•";
-  color: #6c757d;
-  position: absolute;
-  left: 0;
+.rule-highlight {
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-/* Suggested Substitutes Section */
 .substitute-section {
-  margin-top: 20px;
-  padding: 12px;
-  background-color: #f9f9f9;
-  border-left: 4px solid #ccc;
+  grid-column: 1 / -1;
 }
 
 .substitute-list {
-  list-style-type: disc;
-  padding-left: 20px;
-}
-
-.substitute-item {
-  margin: 4px 0;
-  font-size: 14px;
-}
-
-/* Responsive Fixes */
-@media (max-width: 768px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .chart-container,
-  .json-container {
-    grid-column: auto;
-  }
-}
-
-/* Header Styles */
-.deeper-analysis-dashboard h3 {
-  color: #2c3e50;
-  margin: 0 0 15px 0;
-  font-size: 1.3rem;
-}
-
-.deeper-analysis-dashboard h4 {
-  color: #495057;
-  margin: 0 0 12px 0;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.inputs-section {
-  background-color: #f9f9f9;
-  border-radius: 6px;
-  padding: 12px 16px;
-  margin: 16px 0;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
-}
-
-.inputs-section h4 {
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
-.inputs-section ul {
-  list-style: none;
+  list-style-type: none;
   padding: 0;
   margin: 0;
 }
 
-.inputs-section li {
-  margin: 6px 0;
-  font-size: 14px;
+.substitute-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+
+.substitute-item:last-child {
+  border-bottom: none;
+}
+
+.substitute-item strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.substitute-item span {
+  background-color: var(--bg-light);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.loading-message {
+  color: var(--text-secondary);
 }

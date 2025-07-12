@@ -52,3 +52,69 @@
 .recommendation-badge.standard-order { background-color: #17a2b8; }
 .recommendation-badge.hold { background-color: #ffc107; color: #333; }
 .recommendation-badge.use-substitute { background-color: #fd7e14; }
+.recommendation-badge.monitor { background-color: #6c757d; }
+.recommendation-badge.deprioritize { background-color: #dc3545; }
+
+.loading-analysis {
+  padding: 40px;
+  text-align: center;
+  font-size: 1.2rem;
+  color: #6c757d;
+}
+
+/* --- New Styles for the Simulator --- */
+.simulation-container {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.simulation-container h3 {
+  margin-top: 0;
+  color: #343a40;
+}
+
+.simulation-container p {
+  font-size: 0.9rem;
+  color: #6c757d;
+  max-width: 600px;
+}
+
+.slider-group {
+  margin: 20px 0;
+}
+
+.slider-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.slider-group input[type="range"] {
+  width: 100%;
+  cursor: pointer;
+}
+
+.rerun-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.rerun-button:hover {
+  background-color: #0056b3;
+}
+
+.rerun-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}

@@ -1,0 +1,26 @@
+{
+  "status": "ok",
+  "totalResults": 1,
+  "articles": [
+    {
+      "source": { "id": null, "name": "Gizmodo" },
+      "author": "Gizmodo Staff",
+      "title": "New Samsung QLED TV Review: A Stunning Display with a Few Flaws",
+      "description": "Samsung's latest QLED TV boasts incredible brightness and vibrant colors, making it one of the best TVs for bright rooms. The quantum dot technology delivers an exceptional viewing experience, and gaming performance is top-notch with low input lag. However, the software can feel a bit sluggish at times.",
+      "url": "https://gizmodo.com/samsung-qled-tv-review-1848765432",
+      "urlToImage": "https://i.kinja-img.com/image/upload/c_fill,h_675,w_1200/asdfasdfasdf.jpg",
+      "publishedAt": "2025-07-10T14:00:00Z",
+      "content": "Samsung's latest QLED TV is a masterpiece of modern display technology. The colors are simply breathtaking, and it gets bright enough to sear your retinas...[+2500 chars]"
+    },
+    {
+      "source": { "id": "the-verge", "name": "The Verge" },
+      "author": "Chris Welch",
+      "title": "LG's new OLED is a contender for TV of the year",
+      "description": "LG continues to dominate the OLED market with its C-series TVs. The picture quality is outstanding, with perfect blacks and infinite contrast. This is a premium experience through and through.",
+      "url": "https://www.theverge.com/22987654/lg-c2-oled-tv-review",
+      "urlToImage": "https://cdn.vox-cdn.com/thumbor/asdfasdf/0x0:2040x1360/1200x800/filters:focal(857x517:1183x843)/cdn.vox-cdn.com/uploads/chorus_image/image/70654321/asdf.jpg",
+      "publishedAt": "2025-07-09T13:00:00Z",
+      "content": "If you're looking for the best possible picture quality, OLED is still the king. And LG's C-series continues to be the default choice for many...[+3000 chars]"
+    }
+  ]
+}

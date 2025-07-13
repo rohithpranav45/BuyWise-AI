@@ -15,7 +15,7 @@ console.log('🔗 API Base URL:', API_BASE_URL);
 // Configure axios instance
 const client = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -25,6 +25,16 @@ const client = axios.create({
 // Interceptors for logging and error handling (no changes needed here)
 client.interceptors.request.use(/* ... */);
 client.interceptors.response.use(/* ... */);
+
+export const fetchStores = async () => {
+  try {
+    const response = await client.get('/stores');
+    return { data: response.data || [] };
+  } catch (error) {
+    console.error('❌ Failed to fetch stores:', error);
+    throw error;
+  }
+};
 
 export const fetchDashboardStatus = async () => {
   try {
@@ -47,38 +57,17 @@ export const fetchProducts = async () => {
   }
 };
 
-export const analyzeProduct = async (productId, customInputs = {}) => {
+export const analyzeProduct = async (productId, storeId, customInputs = {}) => {
+  // This function is now the only one needed for detailed view.
   try {
-    console.log(`🔍 Analyzing product: ${productId} with overrides:`, customInputs);
-    
-    if (!productId) {
-      throw new Error('Product ID is required');
-    }
-    
-    // Combine the product ID with any custom inputs for the request body
-    const requestData = { productId, ...customInputs };
-    
+    const requestData = { productId, storeId, ...customInputs };
     const response = await client.post('/analyze', requestData);
-    
     if (!response.data || !response.data.recommendation) {
-        throw new Error('Invalid analysis response from server');
+      throw new Error('Invalid analysis response from server');
     }
-
-    console.log(`✅ Analysis completed for product ${productId}`);
     return { data: response.data };
-
   } catch (error) {
     console.error('❌ Failed to analyze product:', error);
-    throw error;
-  }
-};
-
-export const fetchSubstitutes = async (productId) => {
-  try {
-    const response = await client.post('/substitute', { productId });
-    return { data: response.data || [] };
-  } catch (error) {
-    console.error('❌ Failed to fetch substitutes:', error);
     throw error;
   }
 };

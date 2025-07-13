@@ -1,134 +1,129 @@
-/* Main container for the deeper analysis section */
-.deeper-analysis-dashboard {
-  margin-top: 24px;
+.intelligence-hub {
+  margin-top: 32px;
 }
 
-.deeper-analysis-dashboard h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
+.hub-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding-bottom: 16px;
   margin-bottom: 24px;
-  color: var(--text-primary);
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 3px solid var(--spark-yellow);
 }
 
-/* Grid layout for the analysis cards */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 24px;
+.hub-section {
+  margin-bottom: 32px;
 }
 
-/* Base styles for all "cards" in the dashboard */
-.dashboard-card {
-  padding: var(--card-padding);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  background: var(--bg-white);
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
-}
-
-.chart-container {
-  min-height: 300px;
-}
-
-.chart-wrapper {
-  flex-grow: 1;
-  position: relative;
-}
-
-.dashboard-card h4 {
-  font-size: 1.1rem;
+.section-title {
+  font-size: 1.2rem;
   font-weight: 600;
-  color: var(--text-primary);
-  margin-top: 0;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   margin-bottom: 16px;
 }
 
-/* --- vvvvvv NEW AND UPDATED STYLES FOR JSON VIEW vvvvvv --- */
-.json-container {
-  /* Remove padding to allow the wrapper to control it */
-  padding: 0; 
+/* --- Gauge Grid Styles --- */
+.gauge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
 }
 
-.json-container h4 {
-  /* Add padding back for the header inside the card */
-  padding: var(--card-padding);
-  padding-bottom: 0;
-  margin-bottom: 0;
-}
-
-/* This wrapper provides a clean, inset look */
-.json-view-wrapper {
-  background-color: var(--bg-light);
-  margin: var(--card-padding);
-  border-radius: var(--border-radius);
-  padding: 4px; /* A small padding inside the wrapper */
-  border: 1px solid var(--border-color);
-  flex-grow: 1;
-}
-
-/* Override default styles of the react-json-view component */
-.w-rjv-inner {
-  padding: 0 !important;
-}
-/* --- ^^^^^^ END OF NEW AND UPDATED STYLES ^^^^^^ --- */
-
-.rules-container ul {
-  padding-left: 20px;
-  margin: 0;
-  font-family: 'SF Mono', Menlo, monospace;
-  font-size: 0.85rem;
-}
-
-.rules-container li {
-  margin-bottom: 12px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
-.rule-highlight {
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.substitute-section {
-  grid-column: 1 / -1;
-}
-
-.substitute-list {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.substitute-item {
+/* --- Live Demand Intel (News) Styles --- */
+.news-feed {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border-color);
-  font-size: 0.9rem;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.substitute-item:last-child {
-  border-bottom: none;
+.news-card {
+  display: block;
+  background-color: var(--light-theme-surface);
+  border: 1px solid var(--border-color);
+  border-left: 5px solid var(--primary-blue);
+  padding: 16px;
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  transition: var(--transition-base);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
 }
 
-.substitute-item strong {
-  color: var(--text-primary);
+.news-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-left-color: var(--spark-yellow);
+}
+
+.news-source {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.news-title {
+  font-size: 1rem;
   font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
 }
 
-.substitute-item span {
-  background-color: var(--bg-light);
-  padding: 4px 8px;
-  border-radius: 6px;
+.news-link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary-blue);
+}
+
+/* --- Strategic Substitutes Styles --- */
+.substitute-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.substitute-card {
+  background-color: var(--light-theme-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  transition: var(--transition-base);
+}
+
+.substitute-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-blue);
+}
+
+.substitute-card h5 {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.substitute-card p {
   font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 12px 0;
+}
+
+.similarity-metric {
+  display: inline-block;
+  background-color: #e9f5ff; /* A light, complementary blue */
+  color: #005a9c; /* A strong blue text color */
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.8rem;
 }
 
 .loading-message {
+  padding: 40px;
+  text-align: center;
+  font-size: 1.1rem;
   color: var(--text-secondary);
 }

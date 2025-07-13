@@ -6,17 +6,24 @@ const RECOMMENDATION_ORDER = [
   'Bulk Order', 'Standard Order', 'Use Substitute', 'Hold', 'Monitor', 'Deprioritize', 'Error'
 ];
 
-const DashboardSummary = ({ statuses, activeFilter, onFilterChange }) => {
+const DashboardSummary = ({ statuses, activeFilter, onFilterChange, selectedCategory, onBackToCategories }) => {
+  // Calculate counts for each recommendation type
   const counts = Object.values(statuses).reduce((acc, status) => {
     acc[status] = (acc[status] || 0) + 1;
     return acc;
   }, {});
+  
+  // Create a nicer display name, e.g., "Canned Goods" -> "Canned Goods"
+  const categoryDisplayName = selectedCategory.replace(/_/g, ' ');
 
   const totalProducts = Object.keys(statuses).length;
 
   return (
     <div className="dashboard-summary">
-      <h2 className="summary-title">Procurement Dashboard</h2>
+      <div className="summary-header">
+        <h2 className="summary-title">{categoryDisplayName} Dashboard</h2>
+        <button onClick={onBackToCategories} className="back-btn">← All Departments</button>
+      </div>
       <div className="summary-filters">
         <button
           onClick={() => onFilterChange('All')}
@@ -48,6 +55,8 @@ DashboardSummary.propTypes = {
   statuses: PropTypes.object.isRequired,
   activeFilter: PropTypes.string.isRequired,
   onFilterChange: PropTypes.func.isRequired,
+  selectedCategory: PropTypes.string.isRequired,
+  onBackToCategories: PropTypes.func.isRequired,
 };
 
 export default DashboardSummary;

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "store_100",
+    "name": "Walmart Supercenter #100",
+    "city": "Bentonville",
+    "state": "AR",
+    "lat": 36.3729,
+    "lon": -94.2088,
+    "local_event_modifier": 0.0
+  },
+  {
+    "id": "store_54",
+    "name": "Walmart Supercenter #54",
+    "city": "Miami",
+    "state": "FL",
+    "lat": 25.7617,
+    "lon": -80.1918,
+    "local_event_modifier": 0.2
+  },
+  {
+    "id": "store_321",
+    "name": "Walmart Supercenter #321",
+    "city": "Denver",
+    "state": "CO",
+    "lat": 39.7392,
+    "lon": -104.9903,
+    "local_event_modifier": 0.0
+  },
+  {
+    "id": "store_87",
+    "name": "Walmart Supercenter #87",
+    "city": "Los Angeles",
+    "state": "CA",
+    "lat": 34.0522,
+    "lon": -118.2437,
+    "local_event_modifier": 0.1
+  },
+  {
+    "id": "store_1234",
+    "name": "Walmart Supercenter #1234",
+    "city": "Chicago",
+    "state": "IL",
+    "lat": 41.8781,
+    "lon": -87.6298,
+    "local_event_modifier": 0.0
+  }
+]

@@ -1,17 +1,43 @@
 .dashboard-summary {
-  background-color: var(--bg-white);
-  padding: var(--card-padding);
+  background-color: var(--light-theme-surface);
+  padding: 24px;
   border-radius: var(--border-radius);
   margin-bottom: 25px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   border: 1px solid var(--border-color);
+}
+/* ... (the rest of the DashboardSummary CSS remains the same from the previous step) ... */
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 .summary-title {
-  margin-top: 0;
-  margin-bottom: 15px;
+  margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.back-btn {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: var(--transition-base);
+  color: var(--text-secondary);
+}
+
+.back-btn:hover {
+  background-color: var(--bg-light);
+  border-color: #cdd5df;
   color: var(--text-primary);
 }
 
@@ -42,6 +68,7 @@
   border-color: transparent;
 }
 
+/* Colors for each active filter badge */
 .filter-badge.all.active { background-color: #495057; }
 .filter-badge.bulk-order.active { background-color: var(--color-success); }
 .filter-badge.standard-order.active { background-color: var(--color-info); }

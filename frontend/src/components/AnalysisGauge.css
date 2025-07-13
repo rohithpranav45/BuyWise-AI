@@ -1,0 +1,14 @@
+.gauge-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--light-theme-surface);
+  padding: 16px;
+  text-align: center;
+}
+
+.gauge-label {
+  margin-top: -20px; /* Pull the label up to overlap the gauge */
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}

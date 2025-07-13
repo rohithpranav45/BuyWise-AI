@@ -8,11 +8,7 @@ const ProductListItem = ({ product, onProductSelect, status }) => {
   return (
     <div className="product-list-item" onClick={() => onProductSelect(product)}>
       <div className="product-image-container">
-        {status && (
-          <div className={`product-status-badge ${statusClassName}`}>
-            {status}
-          </div>
-        )}
+        {/* --- The badge is now above the image for a cleaner look --- */}
         <img
           src={product.imageUrl || '/placeholder-product.png'}
           alt={product.name}
@@ -20,6 +16,13 @@ const ProductListItem = ({ product, onProductSelect, status }) => {
         />
       </div>
       <div className="product-item-info">
+        {/* --- vvvvvv BADGE MOVED HERE FOR BETTER STYLING vvvvvv --- */}
+        {status && (
+          <div className={`product-status-tag ${statusClassName}`}>
+            {status}
+          </div>
+        )}
+        {/* --- ^^^^^^ END OF MOVED BADGE ^^^^^^ --- */}
         <h3>{product.name || 'Unnamed Product'}</h3>
         <p>SKU: {product.sku || 'N/A'}</p>
         <p>Stock: <strong>{product.inventory?.stock ?? 'N/A'}</strong> units</p>

@@ -3,13 +3,13 @@ import Header from './components/Header';
 import ProductList from './components/ProductList';
 import ProductDetail from './components/ProductDetail';
 import Placeholder from './components/Placeholder';
-import DashboardSummary from './components/DashboardSummary'; // <-- Import new component
+import DashboardSummary from './components/DashboardSummary';
+import StoreSelectorModal from './components/StoreSelectorModal';
+import CategorySelector from './components/CategorySelector'; // <-- The new component
 import { 
   fetchProducts, 
   analyzeProduct, 
-  healthCheck, 
-  fetchSubstitutes,
-  fetchDashboardStatus // <-- Import new API function
+  fetchDashboardStatus
 } from './api/client';
 import './App.css';
 
@@ -17,57 +17,62 @@ function App() {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [loading, setLoading] = useState({ products: true, analysis: false });
+  const [loading, setLoading] = useState({ app: true, analysis: false });
   const [error, setError] = useState(null);
-  
-  // --- State for the new dashboard feature ---
   const [dashboardStatus, setDashboardStatus] = useState({});
   const [activeFilter, setActiveFilter] = useState('All');
+  
+  const [selectedStore, setSelectedStore] = useState(() => {
+    try {
+      const saved = localStorage.getItem('selectedStore');
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
+
+  // --- NEW: State for the selected category ---
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   const handleError = (err, ctx) => console.error(`Error in ${ctx}:`, err);
 
+  // This effect fetches product and status data after a store is selected.
   useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        setLoading(prev => ({ ...prev, products: true }));
-        await healthCheck();
-        
-        // Fetch products and dashboard statuses in parallel
-        const [productsResponse, statusResponse] = await Promise.all([
-          fetchProducts(),
-          fetchDashboardStatus()
-        ]);
+    if (selectedStore) {
+      setLoading(prev => ({ ...prev, app: true }));
+      Promise.all([fetchProducts(), fetchDashboardStatus()])
+        .then(([productsResponse, statusResponse]) => {
+          setProducts(productsResponse.data || []);
+          setDashboardStatus(statusResponse.data || {});
+        })
+        .catch(err => handleError(err, 'fetchInitialData'))
+        .finally(() => setLoading(prev => ({ ...prev, app: false })));
+    }
+  }, [selectedStore]);
 
-        setProducts(productsResponse.data || []);
-        setDashboardStatus(statusResponse.data || {});
-      } catch (err) {
-        handleError(err, 'fetchInitialData');
-        setError('Could not load initial dashboard data.');
-      } finally {
-        setLoading(prev => ({ ...prev, products: false }));
-      }
-    };
-    fetchInitialData();
-  }, []);
+  const handleStoreSelect = (store) => {
+    localStorage.setItem('selectedStore', JSON.stringify(store));
+    setSelectedStore(store);
+  };
+
+  const handleBackToStoreSelect = () => {
+    localStorage.removeItem('selectedStore');
+    setSelectedStore(null);
+    setSelectedCategory(null); // Ensure everything resets
+    setProducts([]);
+  };
 
   const runAnalysis = useCallback(async (productId, customInputs) => {
-    // (This function is from Enhancement 1 and is unchanged)
+    if (!selectedStore) return;
     setLoading(prev => ({ ...prev, analysis: true }));
     setError(null);
     try {
-      const [analysisResponse, substitutesResponse] = await Promise.all([
-        analyzeProduct(productId, customInputs),
-        fetchSubstitutes(productId)
-      ]);
-      const combinedResult = { ...analysisResponse.data, analysis: { ...analysisResponse.data.analysis, substitutes: substitutesResponse.data || [] } };
-      setAnalysisResult(combinedResult);
+      const response = await analyzeProduct(productId, selectedStore.id, customInputs);
+      setAnalysisResult(response.data);
     } catch (err) {
       handleError(err, 'runAnalysis');
-      setError('Failed to run detailed analysis.');
     } finally {
       setLoading(prev => ({ ...prev, analysis: false }));
     }
-  }, []);
+  }, [selectedStore]);
 
   const handleProductSelect = (product) => {
     if (!product || !product.id) return;
@@ -82,45 +87,56 @@ function App() {
     setError(null);
   }, []);
 
-  const renderContent = () => {
-    if (loading.products) return <Placeholder count={12} />;
-    if (error && !selectedProduct) return <div className="error-message">Error: {error}</div>;
+  // --- NEW HIERARCHICAL RENDERING ---
+  // Level 1: If no store is selected, show the store selector.
+  if (!selectedStore) {
+    return <StoreSelectorModal onStoreSelect={handleStoreSelect} />;
+  }
 
-    if (selectedProduct) {
-      return (
-        <ProductDetail 
-          product={selectedProduct} 
-          analysis={analysisResult}
-          isLoading={loading.analysis}
-          onBack={handleBackToProducts}
-          onRerunAnalysis={runAnalysis}
-        />
-      );
-    }
-    
-    // Render the dashboard summary and the filtered list
+  // Level 2: If a store is selected but no category, show the category selector.
+  if (!selectedCategory) {
     return (
-      <>
-        <DashboardSummary 
-          statuses={dashboardStatus}
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-        />
-        <ProductList 
-          products={products} 
-          onProductSelect={handleProductSelect}
-          statuses={dashboardStatus}
-          filter={activeFilter}
-        />
-      </>
+      <CategorySelector
+        products={products}
+        statuses={dashboardStatus}
+        onCategorySelect={setSelectedCategory}
+        onBackToStoreSelect={handleBackToStoreSelect}
+      />
     );
-  };
-
+  }
+  
+  // Level 3: If both are selected, render the main application dashboard.
   return (
     <div className="app-container">
-      <Header />
+      <Header store={selectedStore} onChangeStore={handleBackToStoreSelect} />
       <main className="main-content" key={selectedProduct ? selectedProduct.id : 'product-list'}>
-        {renderContent()}
+        {loading.app ? <Placeholder count={12} /> : (
+          selectedProduct ? (
+            <ProductDetail 
+              product={selectedProduct} 
+              analysis={analysisResult}
+              isLoading={loading.analysis}
+              onBack={handleBackToProducts}
+              onRerunAnalysis={runAnalysis}
+            />
+          ) : (
+            <>
+              <DashboardSummary 
+                statuses={dashboardStatus}
+                activeFilter={activeFilter}
+                onFilterChange={setActiveFilter}
+                selectedCategory={selectedCategory}
+                onBackToCategories={() => setSelectedCategory(null)} // Provide the reset handler
+              />
+              <ProductList 
+                products={products.filter(p => p.category === selectedCategory)} // Filter products by selected category
+                onProductSelect={handleProductSelect}
+                statuses={dashboardStatus}
+                filter={activeFilter}
+              />
+            </>
+          )
+        )}
       </main>
     </div>
   );

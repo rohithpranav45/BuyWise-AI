@@ -1,0 +1,207 @@
+/* --- THE IMMERSIVE BACKGROUND --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #0d1a2b;
+  background-image:
+    linear-gradient(rgba(1, 41, 95, 0.8), rgba(1, 41, 95, 0.8)),
+    radial-gradient(ellipse at bottom, #002D62, #0d1a2b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* --- THE MAIN CONTAINER --- */
+.modal-container {
+  width: 90%;
+  max-width: 1200px;
+  height: 90vh;
+  max-height: 800px;
+  background: rgba(255, 255, 255, 0.05); /* Frosted glass effect */
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  color: white;
+  animation: slideUp 0.5s ease-out;
+  transition: opacity 0.3s;
+}
+
+.modal-container.loading { opacity: 1; }
+.modal-container.loaded { opacity: 1; }
+
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* --- STYLED HEADER --- */
+.modal-header {
+  text-align: center;
+  padding: 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.modal-header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.modal-header .spark {
+  color: var(--spark-yellow);
+}
+
+.modal-header p {
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+}
+
+/* --- TWO-COLUMN BODY LAYOUT --- */
+.modal-body {
+  display: flex;
+  flex: 1;
+  min-height: 0; /* Critical for flexbox children with overflow */
+}
+
+/* --- LEFT PANEL: THE MAP --- */
+.map-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0d1a2b; /* Dark background for high contrast */
+  padding: 16px;
+  overflow: hidden; /* Ensures map SVG does not break layout */
+}
+
+/* --- RIGHT PANEL: THE LIST --- */
+.list-panel {
+  flex-basis: 350px;
+  flex-shrink: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.list-panel h4 {
+  margin: 0 0 16px 0;
+  font-weight: 600;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.store-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 10px;
+}
+
+.store-list-item {
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-left-width: 4px;
+  border-radius: var(--border-radius);
+  color: white;
+  transition: var(--transition-base);
+  display: flex;
+  justify-content: space-between;
+}
+
+.store-list-item.active, .store-list-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-left-color: var(--spark-yellow);
+  transform: translateX(5px);
+}
+
+.store-list-item strong { font-weight: 600; }
+.store-list-item span { opacity: 0.7; }
+
+/* --- MAP & MARKER STYLING --- */
+.geography-style {
+  fill: #002d62; /* A deep, on-brand blue */
+  stroke: #1e4d82; /* Lighter strokes for definition */
+  stroke-width: 1;
+  outline: none;
+}
+
+.store-marker {
+  cursor: pointer;
+}
+
+@keyframes radar-pulse {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+.marker-halo {
+  fill: var(--spark-yellow);
+  stroke-width: 0;
+  opacity: 0; /* Hidden by default */
+  transform-origin: center;
+}
+
+.marker-halo.active {
+  animation: radar-pulse 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.marker-circle {
+  fill: white;
+  stroke: var(--spark-yellow);
+  stroke-width: 1.5;
+  transition: all 0.2s ease;
+  filter: drop-shadow(0 0 3px var(--spark-yellow));
+}
+
+.store-marker:hover .marker-circle {
+  fill: var(--spark-yellow);
+  stroke: white;
+}
+
+/* --- LOADING SPINNER --- */
+.loading-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--spark-yellow);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}

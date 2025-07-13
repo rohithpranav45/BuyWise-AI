@@ -1,40 +1,67 @@
 .app-header {
-  background: var(--primary-blue);
-  padding: 20px 40px;
-  color: white;
+  background: var(--dark-theme-surface);
+  padding: 16px 40px;
+  color: var(--text-on-dark);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-bottom: 3px solid var(--spark-yellow);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-.header-title {
-  margin: 0;
-}
+/* ... (the rest of the header CSS remains the same from the previous step) ... */
 
 .header-title h1 {
   margin: 0;
-  font-size: 2.2rem;
+  font-size: 2rem; /* Slightly smaller for a more refined look */
   font-weight: 700;
-  display: flex;
-  align-items: center;
 }
 
 .header-title .spark {
   color: var(--spark-yellow);
-  font-size: 2.5rem;
-  margin: 0 8px;
+  font-size: 2.2rem;
   line-height: 1;
 }
 
-.header-title p {
-  margin: 5px 0 0;
-  font-size: 0.9rem;
-  opacity: 0.8;
-  font-weight: 400;
+.header-context {
+  display: flex;
+  align-items: center;
+  gap: 24px;
 }
 
 .header-status {
+  text-align: right;
+}
+
+.header-status span {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.7;
+}
+
+.header-status strong {
+  display: block;
   font-size: 0.9rem;
-  opacity: 0.9;
+  font-weight: 500;
+}
+
+.change-store-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 40px; /* Square button */
+  height: 40px;
+  border-radius: var(--border-radius);
+  transition: var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.change-store-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: white;
 }

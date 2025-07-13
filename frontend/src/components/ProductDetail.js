@@ -3,12 +3,59 @@ import PropTypes from 'prop-types';
 import DeeperAnalysisDashboard from './DeeperAnalysisDashboard';
 import './ProductDetail.css';
 
+// --- NEW: The Aesthetic Decision Map ---
+// This object maps the logical recommendation from the backend to beautiful frontend properties.
+const DECISION_MAP = {
+  'Bulk Order': {
+    icon: '🚀',
+    title: 'Expedite Purchase',
+    subtitle: 'High demand and critical urgency detected. Order in bulk to maximize stock.',
+    className: 'decision-expedite',
+  },
+  'Standard Order': {
+    icon: '🚚',
+    title: 'Standard Replenishment',
+    subtitle: 'Inventory levels are low under normal sales velocity. A standard order is advised.',
+    className: 'decision-standard',
+  },
+  'Use Substitute': {
+    icon: '↔️',
+    title: 'Source Alternate SKU',
+    subtitle: 'Prohibitive costs or external factors advise against ordering this product. Evaluate substitutes.',
+    className: 'decision-substitute',
+  },
+  'Hold': {
+    icon: '⏸️',
+    title: 'Defer Action',
+    subtitle: 'Current conditions (cost, demand, or inventory) are unfavorable. Hold all orders.',
+    className: 'decision-hold',
+  },
+  'Monitor': {
+    icon: '🔍',
+    title: 'Place on Watchlist',
+    subtitle: 'Metrics are stable but require monitoring for potential changes in demand or urgency.',
+    className: 'decision-monitor',
+  },
+  'Deprioritize': {
+    icon: '🔻',
+    title: 'Deprioritize SKU',
+    subtitle: 'Low demand and sufficient stock. Deprioritize this product from procurement cycle.',
+    className: 'decision-deprioritize',
+  },
+  'Error': {
+    icon: '⚠️',
+    title: 'Analysis Error',
+    subtitle: 'Could not complete the analysis due to an error. Please check the logs.',
+    className: 'decision-error',
+  },
+};
+
 const ProductDetail = ({ product, analysis, isLoading, onBack, onRerunAnalysis }) => {
   const [simTariff, setSimTariff] = useState(null);
   const [simDemand, setSimDemand] = useState(null);
 
   useEffect(() => {
-    if (analysis && analysis.analysis && analysis.analysis.inputs) {
+    if (analysis?.analysis?.inputs) {
       setSimTariff(analysis.analysis.inputs.tariffRate);
       setSimDemand(analysis.analysis.inputs.demandSignal);
     }
@@ -16,23 +63,14 @@ const ProductDetail = ({ product, analysis, isLoading, onBack, onRerunAnalysis }
 
   const handleRerunAnalysis = () => {
     if (isLoading) return;
-    onRerunAnalysis(product.id, {
-      customTariff: simTariff,
-      customDemand: simDemand,
-    });
+    onRerunAnalysis(product.id, { customTariff: simTariff, customDemand: simDemand });
   };
 
-  if (!product) {
-    return (
-      <div className="product-detail-container">
-        <button onClick={onBack} className="back-button">← Back to Products</button>
-        <p>Product data is unavailable.</p>
-      </div>
-    );
-  }
+  // Get the aesthetic properties from our map, with a safe fallback
+  const decision = analysis ? (DECISION_MAP[analysis.recommendation] || DECISION_MAP['Error']) : null;
 
+  if (!product) return null;
   const { name, sku, category, price, imageUrl, inventory } = product;
-  const recommendationClass = analysis?.recommendation?.toLowerCase().replace(/ /g, '-');
 
   return (
     <div className="product-detail-container">
@@ -51,41 +89,33 @@ const ProductDetail = ({ product, analysis, isLoading, onBack, onRerunAnalysis }
 
       {isLoading && !analysis && <div className="loading-analysis">⏳ Analyzing product...</div>}
       
-      {analysis && (
-        <div className="recommendation-section">
-          <h3>Procurement Recommendation</h3>
-          <div className={`recommendation-badge ${recommendationClass}`}>
-            {analysis.recommendation}
+      {/* --- vvvvvv THIS IS THE NEW JSX FOR THE DECISION CARD vvvvvv --- */}
+      {decision && (
+        <div className={`decision-card ${decision.className}`}>
+          <div className="decision-icon">{decision.icon}</div>
+          <div className="decision-text">
+            <h4>{decision.title}</h4>
+            <p>{decision.subtitle}</p>
           </div>
         </div>
       )}
+      {/* --- ^^^^^^ END OF NEW JSX ^^^^^^ --- */}
 
       <div className="simulation-container">
         <h3>What-If Scenario Simulator</h3>
         <p>Adjust the sliders to see how external factors impact the procurement decision in real-time.</p>
-        
         {simTariff !== null ? (
           <div className="slider-group">
             <label>Tariff Rate: <strong>{(simTariff * 100).toFixed(1)}%</strong></label>
-            <input 
-              type="range" min="0" max="0.5" step="0.01" 
-              value={simTariff} 
-              onChange={(e) => setSimTariff(parseFloat(e.target.value))}
-            />
+            <input type="range" min="0" max="0.5" step="0.01" value={simTariff} onChange={(e) => setSimTariff(parseFloat(e.target.value))} />
           </div>
         ) : <p>Loading simulator...</p>}
-
         {simDemand !== null ? (
           <div className="slider-group">
-            <label>Demand Signal (News Sentiment): <strong>{simDemand.toFixed(2)}</strong></label>
-            <input 
-              type="range" min="-1" max="1" step="0.1"
-              value={simDemand}
-              onChange={(e) => setSimDemand(parseFloat(e.target.value))}
-            />
+            <label>Demand Signal: <strong>{simDemand.toFixed(2)}</strong></label>
+            <input type="range" min="-1" max="1" step="0.1" value={simDemand} onChange={(e) => setSimDemand(parseFloat(e.target.value))} />
           </div>
         ) : null}
-        
         <button onClick={handleRerunAnalysis} disabled={isLoading || simTariff === null} className="rerun-button">
           {isLoading ? 'Analyzing...' : '⚡ Re-Run Analysis'}
         </button>
@@ -97,7 +127,7 @@ const ProductDetail = ({ product, analysis, isLoading, onBack, onRerunAnalysis }
 };
 
 ProductDetail.propTypes = {
-  product: PropTypes.object.isRequired,
+  product: PropTypes.object,
   analysis: PropTypes.object,
   isLoading: PropTypes.bool,
   onBack: PropTypes.func.isRequired,

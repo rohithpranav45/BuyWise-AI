@@ -1,152 +1,90 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Bar } from 'react-chartjs-2';
-import ReactJson from '@uiw/react-json-view';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import AnalysisGauge from './AnalysisGauge';         // The new gauge component
+import SupplyChainMap from './SupplyChainMap';       // The new map component
 import './DeeperAnalysisDashboard.css';
 
-// Chart.js components are registered once
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+// A helper function to normalize a -1 to 1 score into a 0 to 1 percentile for the gauges
+const normalizeScore = (score = 0) => (score + 1) / 2;
 
 const DeeperAnalysisDashboard = ({ analysisData }) => {
-  // Safe fallback if the entire analysis object is missing
+  // A safety check for the entire data object to prevent crashes
   if (!analysisData) {
     return (
-      <div className="deeper-analysis-dashboard">
-        <h3>Deeper Analysis</h3>
-        <p className="loading-message">Awaiting analysis data...</p>
+      <div className="intelligence-hub">
+        <p className="loading-message">Loading intelligence report...</p>
       </div>
     );
   }
 
-  // Destructure with safe defaults for each property
+  // Destructure all needed properties from the analysis data, with safe defaults
   const { 
     scores = {}, 
-    inputs = {}, 
-    rulesTriggered = [], 
-    substitutes = [] 
+    substitutes = [], 
+    news_articles = [], 
+    supplyChainMapData = [] 
   } = analysisData;
 
-  const chartData = {
-    labels: Object.keys(scores),
-    datasets: [
-      {
-        label: 'Score',
-        data: Object.values(scores),
-        // Using the new primary blue from our design system
-        backgroundColor: 'rgba(0, 76, 145, 0.7)', 
-        borderColor: 'rgba(0, 76, 145, 1)',
-        borderWidth: 1,
-        borderRadius: 4,
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    indexAxis: 'y', // Horizontal bar chart is often easier to read for labels
-    plugins: {
-      legend: { display: false },
-      title: {
-        display: false, // Title is handled by the <h4> tag now
-      },
-    },
-    scales: {
-      x: {
-        beginAtZero: false,
-        min: -1,
-        max: 1,
-        grid: {
-          color: '#e0e6ed', // Use a theme color for grid lines
-        },
-        ticks: {
-          color: '#5a6a7b', // Use a theme color for labels
-        },
-      },
-      y: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          color: '#5a6a7b',
-        },
-      },
-    },
-  };
-
   return (
-    <div className="deeper-analysis-dashboard">
-      <h3>Deeper Analysis</h3>
-      <div className="dashboard-grid">
-        <div className="dashboard-card chart-container">
-          <h4>Factor Scores</h4>
-          <div className="chart-wrapper">
-            <Bar options={chartOptions} data={chartData} />
-          </div>
+    <div className="intelligence-hub">
+      <h3 className="hub-title">Intelligence Hub</h3>
+      
+      {/* --- GAUGE SECTION --- */}
+      <div className="hub-section">
+        <h4 className="section-title">Core Factor Analysis</h4>
+        <div className="gauge-grid">
+          <AnalysisGauge title="Cost Impact" value={normalizeScore(scores.costImpactScore)} />
+          <AnalysisGauge title="Demand Signal" value={normalizeScore(scores.demandScore)} />
+          <AnalysisGauge title="Urgency Score" value={normalizeScore(scores.urgencyScore)} />
         </div>
-
-        <div className="dashboard-card json-container">
-          <h4>Engine Inputs</h4>
-          <div className="json-view-wrapper">
-            <ReactJson 
-              value={inputs || { status: "No data available." }}
-              theme="vscode" /* Changed from "monokai" to a light theme */
-              collapsed={1}
-              displayDataTypes={false}
-              displayObjectSize={false}
-              name={false}
-              style={{
-                fontFamily: "var(--font-family-base)", // Use our app's font
-                fontSize: "0.9rem",
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="dashboard-card rules-container">
-          <h4>Engine Log ({rulesTriggered.length})</h4>
-          <ul>
-            {rulesTriggered.map((rule, index) => (
-              <li 
-                key={index} 
-                className={rule.startsWith('RULE:') ? 'rule-highlight' : ''}
-              >
-                {rule}
-              </li>
-            ))}
-          </ul>
-        </div>
-        
-        {substitutes && substitutes.length > 0 && (
-          <div className="dashboard-card substitute-section">
-            <h4>🛍️ Suggested Substitutes</h4>
-            <ul className="substitute-list">
-              {substitutes.map((item) => (
-                <li key={item.id} className="substitute-item">
-                  <strong>{item.name}</strong> (SKU: {item.sku})
-                  <span>Similarity: <strong>{(item.similarity * 100).toFixed(0)}%</strong></span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
+      
+      {/* --- SUPPLY CHAIN VISUALIZATION SECTION --- */}
+      {/* This section only renders if the map data exists */}
+      {supplyChainMapData && supplyChainMapData.length > 0 && (
+        <div className="hub-section">
+          <h4 className="section-title">Supply Chain Visualization</h4>
+          <SupplyChainMap mapData={supplyChainMapData} />
+        </div>
+      )}
+      
+      {/* --- LIVE DEMAND INTEL (NEWS) SECTION --- */}
+      {/* This section only renders if there are news articles to show */}
+      {news_articles && news_articles.length > 0 && (
+        <div className="hub-section">
+          <h4 className="section-title">Live Demand Intel</h4>
+          <div className="news-feed">
+            {news_articles.map((article, index) => (
+              <a href={article.url} target="_blank" rel="noopener noreferrer" className="news-card" key={index}>
+                <div className="news-source">{article.source || 'Online Publication'}</div>
+                <div className="news-title">{article.title}</div>
+                <div className="news-link">Read Source Article →</div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* --- STRATEGIC SUBSTITUTES SECTION --- */}
+      {/* This section will only render if there are substitutes available */}
+      {substitutes && substitutes.length > 0 && (
+        <div className="hub-section">
+          <h4 className="section-title">Strategic Substitutes</h4>
+          <div className="substitute-grid">
+            {substitutes.map(item => (
+              <div key={item.id} className="substitute-card">
+                <h5>{item.name}</h5>
+                <p>SKU: {item.sku}</p>
+                <div className="substitute-metrics">
+                  <span className="similarity-metric">
+                    ~{(item.similarity * 100).toFixed(0)}% Match
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

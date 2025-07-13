@@ -1,0 +1,128 @@
+.category-selector-container {
+  width: 100%;
+  min-height: 100vh;
+  padding: 40px;
+  box-sizing: border-box;
+  background-color: #0d1a2b;
+  color: white;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.category-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.category-header h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.category-header p {
+  font-size: 1.2rem;
+  opacity: 0.7;
+  margin: 10px 0 20px 0;
+}
+
+.back-to-stores-btn {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.back-to-stores-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: white;
+}
+
+.category-grid {
+  display: grid;
+  /* Use a more balanced minmax for better responsiveness */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.category-card {
+  position: relative;
+  /* --- CARD SIZING AND ALIGNMENT FIX --- */
+  /* Using aspect-ratio for consistent, responsive shaping */
+  aspect-ratio: 3 / 4; 
+  display: flex; /* Enables easy alignment of child content */
+  flex-direction: column;
+  justify-content: flex-end; /* Pushes content to the bottom */
+  
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  /* Background image properties are crucial */
+  background-size: cover;
+  background-position: center;
+}
+
+.category-card:hover {
+  transform: translateY(-15px) rotate(3deg);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+}
+
+.card-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0) 60%);
+  transition: background 0.4s ease-in-out;
+}
+
+.category-card:hover .card-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 5%, rgba(0,0,0,0) 50%);
+}
+
+.card-content {
+  position: relative;
+  z-index: 2;
+  padding: 24px;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.8rem; /* Adjusted for better fit in smaller card */
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+}
+
+.urgent-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background-color: var(--spark-yellow);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  z-index: 3;
+  animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 194, 32, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 194, 32, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 194, 32, 0); }
+}

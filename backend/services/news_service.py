@@ -3,28 +3,25 @@ import requests
 from textblob import TextBlob
 import json
 
-# Retrieve the API key from environment variables
 NEWS_API_KEY = os.getenv('NEWS_API_KEY')
 NEWS_API_URL = 'https://newsapi.org/v2/everything'
 
-def get_news_for_product(product_name):
-    """
-    Fetches news articles related to a product name.
-    Includes a timeout and a local file fallback for network errors.
-    """
-    # First, try the live API if the key exists
-    if NEWS_API_KEY:
-        params = { 'q': product_name, 'apiKey': NEWS_API_KEY, 'pageSize': 20, 'sortBy': 'relevancy', 'language': 'en' }
-        try:
-            response = requests.get(NEWS_API_URL, params=params, timeout=5)
-            response.raise_for_status()
-            print(f"✓ Live news articles fetched for '{product_name}'")
-            return response.json()
-        except requests.exceptions.RequestException as e:
-            print(f"✗ Live news request failed: {e}. Attempting to use local fallback.")
-    
-    # --- FALLBACK LOGIC ---
-    # If the API key is missing or the request failed, use the dummy data.
+def get_live_news(product_name):
+    """Fetches live news from the API."""
+    if not NEWS_API_KEY:
+        return None
+    params = {'q': product_name, 'apiKey': NEWS_API_KEY, 'pageSize': 10, 'sortBy': 'relevancy', 'language': 'en'}
+    try:
+        response = requests.get(NEWS_API_URL, params=params, timeout=5)
+        response.raise_for_status()
+        print(f"✓ Live news articles fetched for '{product_name}'")
+        return response.json()
+    except requests.exceptions.RequestException:
+        print(f"✗ Live news request failed for '{product_name}'.")
+        return None
+
+def get_dummy_news(product_name):
+    """Loads dummy news from a local file."""
     try:
         base_dir = os.path.abspath(os.path.dirname(__file__))
         filepath = os.path.join(base_dir, '..', 'data', 'dummy_news.json')
@@ -33,29 +30,43 @@ def get_news_for_product(product_name):
             return json.load(f)
     except Exception as e:
         print(f"✗ Fallback failed. Could not load dummy_news.json: {e}")
-        return {"error": "Live API and local fallback both failed."}
+        return None
 
 def get_demand_signal(product_name):
     """
-    Calculates a demand signal based on the sentiment of recent news.
-    Returns a score between -1.0 (negative) and 1.0 (positive).
+    Calculates a demand signal and ALSO returns the articles used.
     """
-    news_data = get_news_for_product(product_name)
+    news_data = get_live_news(product_name) or get_dummy_news(product_name)
     
-    if 'error' in news_data or not news_data.get('articles'):
-        print(f"⚠️ No news data for '{product_name}'. Defaulting to neutral signal.")
-        return 0.0
+    if not news_data or not news_data.get('articles'):
+        return {"score": 0.0, "articles": []}
 
     polarities = []
+    top_articles = []
+    
+    # Analyze sentiment and collect top 3 articles
     for article in news_data['articles']:
         title = article.get('title', '') or ''
+        # Exclude generic or irrelevant articles
+        if "review" not in title.lower() and "deals" not in title.lower() and "best" not in title.lower():
+            continue
+            
         description = article.get('description', '') or ''
         analysis = TextBlob(f"{title}. {description}")
         polarities.append(analysis.sentiment.polarity)
+        
+        if len(top_articles) < 3:
+            top_articles.append({
+                "source": article.get("source", {}).get("name"),
+                "title": title,
+                "url": article.get("url")
+            })
 
     if not polarities:
-        return 0.0
+        return {"score": 0.0, "articles": []}
 
     average_polarity = sum(polarities) / len(polarities)
     print(f"📈 Demand signal for '{product_name}': {average_polarity:.2f}")
-    return average_polarity
+    
+    # Return both the score and the top articles
+    return {"score": average_polarity, "articles": top_articles}

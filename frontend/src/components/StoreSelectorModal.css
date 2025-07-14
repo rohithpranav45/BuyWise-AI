@@ -1,4 +1,4 @@
-/* --- THE IMMERSIVE BACKGROUND --- */
+/* --- THE IMMERSIVE BACKGROUND & MODAL CONTAINER --- */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -21,13 +21,12 @@
   to { opacity: 1; }
 }
 
-/* --- THE MAIN CONTAINER --- */
 .modal-container {
   width: 90%;
   max-width: 1200px;
   height: 90vh;
   max-height: 800px;
-  background: rgba(255, 255, 255, 0.05); /* Frosted glass effect */
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 16px;
@@ -36,23 +35,21 @@
   flex-direction: column;
   color: white;
   animation: slideUp 0.5s ease-out;
-  transition: opacity 0.3s;
+  overflow: hidden; /* This is crucial for containing child elements */
 }
-
-.modal-container.loading { opacity: 1; }
-.modal-container.loaded { opacity: 1; }
 
 @keyframes slideUp {
   from { transform: translateY(50px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
+
 /* --- STYLED HEADER --- */
 .modal-header {
   text-align: center;
   padding: 32px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  flex-shrink: 0;
+  flex-shrink: 0; /* Prevents the header from shrinking */
 }
 
 .modal-header h1 {
@@ -71,28 +68,27 @@
   font-size: 1.1rem;
 }
 
+
 /* --- TWO-COLUMN BODY LAYOUT --- */
 .modal-body {
   display: flex;
-  flex: 1;
-  min-height: 0; /* Critical for flexbox children with overflow */
+  flex: 1; /* Allows body to fill remaining vertical space */
+  min-height: 0; /* Prevents flexbox from overflowing its container */
 }
 
-/* --- LEFT PANEL: THE MAP --- */
 .map-panel {
-  flex: 1;
+  flex: 1; /* Let the map panel take up the majority of the width */
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #0d1a2b; /* Dark background for high contrast */
+  background-color: #0d1a2b;
   padding: 16px;
-  overflow: hidden; /* Ensures map SVG does not break layout */
+  overflow: hidden; /* Ensures the map SVG itself doesn't break the layout */
 }
 
-/* --- RIGHT PANEL: THE LIST --- */
 .list-panel {
-  flex-basis: 350px;
-  flex-shrink: 0;
+  flex-basis: 350px; /* Give the list a fixed, elegant width */
+  flex-shrink: 0; /* Prevent the list panel from shrinking */
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
@@ -107,12 +103,12 @@
 }
 
 .store-list {
-  flex-grow: 1;
-  overflow-y: auto;
+  flex-grow: 1; /* Allow the list to fill the remaining space in the panel */
+  overflow-y: auto; /* Enable scrolling ONLY on the list itself */
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding-right: 10px;
+  padding-right: 10px; /* Provides space for the scrollbar */
 }
 
 .store-list-item {
@@ -126,6 +122,8 @@
   transition: var(--transition-base);
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
 }
 
 .store-list-item.active, .store-list-item:hover {
@@ -134,60 +132,71 @@
   transform: translateX(5px);
 }
 
-.store-list-item strong { font-weight: 600; }
+.store-list-item strong { font-weight: 600; color: white; }
 .store-list-item span { opacity: 0.7; }
 
-/* --- MAP & MARKER STYLING --- */
+
+/* --- MAP & MARKER AESTHETICS --- */
 .geography-style {
-  fill: #002d62; /* A deep, on-brand blue */
-  stroke: #1e4d82; /* Lighter strokes for definition */
+  fill: #002d62;
+  stroke: #1e4d82;
   stroke-width: 1;
   outline: none;
 }
 
 .store-marker {
   cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+.store-marker:hover {
+  transform: scale(1.1);
 }
 
-@keyframes radar-pulse {
-  0% {
-    transform: scale(0.5);
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 0.2;
-  }
-  100% {
-    transform: scale(3);
-    opacity: 0;
-  }
+/* --- Enhanced Store Marker Animations --- */
+@keyframes gentle-pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
 }
 
+/* The perimeter halo element - completely static by default */
 .marker-halo {
   fill: var(--spark-yellow);
   stroke-width: 0;
-  opacity: 0; /* Hidden by default */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  /* Keep it fixed in position */
   transform-origin: center;
 }
 
+/* The halo shows as a fixed large circle when active class is added */
 .marker-halo.active {
-  animation: radar-pulse 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.15;
 }
 
+/* Enhanced central dot - FIXED in position */
 .marker-circle {
-  fill: white;
-  stroke: var(--spark-yellow);
-  stroke-width: 1.5;
-  transition: all 0.2s ease;
-  filter: drop-shadow(0 0 3px var(--spark-yellow));
+  fill: var(--spark-yellow);
+  stroke: white;
+  stroke-width: 2;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.6));
+  animation: gentle-pulse 2s ease-in-out infinite;
+  /* Keep the dot completely fixed - no transform changes */
+  transform-origin: center;
 }
 
 .store-marker:hover .marker-circle {
-  fill: var(--spark-yellow);
-  stroke: white;
+  fill: white;
+  stroke: var(--spark-yellow);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 12px rgba(255, 193, 7, 0.8));
+  /* NO TRANSFORM - keep it fixed in position */
+  animation: none; /* Stop pulsing on hover */
 }
 
-/* --- LOADING SPINNER --- */
+
+/* --- LOADING SPINNER STYLES --- */
 .loading-container {
   flex-grow: 1;
   display: flex;
@@ -196,7 +205,9 @@
   justify-content: center;
   gap: 20px;
 }
+
 @keyframes spin { to { transform: rotate(360deg); } }
+
 .spinner {
   width: 50px;
   height: 50px;

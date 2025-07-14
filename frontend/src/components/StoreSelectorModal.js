@@ -40,13 +40,11 @@ const StoreSelectorModal = ({ onStoreSelect }) => {
         ) : (
           <div className="modal-body">
             <div className="map-panel">
-              {/* --- vvvvvv THESE ARE THE FIXES FOR ALIGNMENT vvvvvv --- */}
               <ComposableMap
                 projection="geoAlbersUsa"
-                projectionConfig={{ scale: 1000 }} // Adjusted scale for a better fit
-                style={{ width: "100%", height: "auto" }} // Forces responsive behavior
+                projectionConfig={{ scale: 1000 }} // Adjusted scale
+                style={{ width: "100%", height: "auto" }}
               >
-              {/* --- ^^^^^^ END OF ALIGNMENT FIXES ^^^^^^ --- */}
                 <Geographies geography={geoUrl}>
                   {({ geographies }) =>
                     geographies.map((geo) => (
@@ -62,9 +60,8 @@ const StoreSelectorModal = ({ onStoreSelect }) => {
                       onMouseEnter={() => setHoveredStore(store.id)}
                       onMouseLeave={() => setHoveredStore(null)}
                     >
-                      {/* --- The halo is now first, so it's "underneath" the main dot --- */}
-                      <circle r={15} className={`marker-halo ${hoveredStore === store.id ? 'active' : ''}`} />
-                      <circle r={6} className="marker-circle" />
+                      {/* REMOVED: The problematic marker-halo that was causing flying dots */}
+                      <circle r={5} className="marker-circle" />
                     </g>
                   </Marker>
                 ))}

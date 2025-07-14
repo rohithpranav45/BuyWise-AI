@@ -1,43 +1,62 @@
 import React, { useState } from 'react';
-import { ComposableMap, Geographies, Geography, Marker, Annotation } from 'react-simple-maps';
+import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
+import PropTypes from 'prop-types';
 import './SupplyChainMap.css';
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-const riskStyles = {
-  high: { fill: "var(--color-danger)", stroke: "#ffcdd2" },
-  medium: { fill: "var(--color-warning)", stroke: "#fff3cd" },
-  low: { fill: "var(--color-success)", stroke: "#c8e6c9" }
-};
+// --- HELPER FUNCTIONS FOR DYNAMIC STYLING ---
+const getRiskClass = (riskLevel) => `risk-${riskLevel.toLowerCase()}`;
+
+const getMarkerRadius = (isPrimary) => (isPrimary ? 10 : 7);
 
 const SupplyChainMap = ({ mapData }) => {
-  const [tooltip, setTooltip] = useState('');
+  const [tooltipContent, setTooltipContent] = useState('');
 
   return (
-    <div className="map-container">
-      <ComposableMap projection="geoMercator" projectionConfig={{ scale: 100 }}>
+    <div className="map-card-container">
+      <ComposableMap 
+        projection="geoMercator" 
+        projectionConfig={{ scale: 100, center: [0, 20] }}
+        className="composable-map"
+      >
         <Geographies geography={geoUrl}>
           {({ geographies }) =>
             geographies.map((geo) => <Geography key={geo.rsmKey} geography={geo} className="geography-style" />)
           }
         </Geographies>
-        {mapData.map(({ country, coordinates, risk, isPrimary }) => (
+
+        {/* --- vvvvvv THE CORRECTED DESTRUCTURING IS HERE vvvvvv --- */}
+        {mapData.map(({ country, coordinates, level, isPrimary }, index) => (
           <Marker
-            key={country}
+            key={index}
             coordinates={coordinates}
-            onMouseEnter={() => setTooltip(`${country} - ${risk.toUpperCase()} RISK`)}
-            onMouseLeave={() => setTooltip('')}
+            onMouseEnter={() => setTooltipContent(`${country}: ${level} Risk`)}
+            onMouseLeave={() => setTooltipContent('')}
           >
-            <g className={`map-marker ${isPrimary ? 'primary' : 'secondary'}`}>
-              <circle r={isPrimary ? 8 : 6} style={riskStyles[risk]} />
-              {isPrimary && <circle r={15} className="marker-halo" />}
+            {/* The main marker group now uses 'level' directly */}
+            <g className={`map-marker ${getRiskClass(level)}`} style={{ animationDelay: `${index * 150}ms` }}>
+              <circle
+                r={getMarkerRadius(isPrimary)}
+                className="marker-circle"
+              />
+              <circle
+                r={getMarkerRadius(isPrimary)}
+                className="marker-ping"
+              />
             </g>
           </Marker>
         ))}
+        {/* --- ^^^^^^ END OF THE CORRECTION ^^^^^^ --- */}
+
       </ComposableMap>
-      {tooltip && <div className="map-tooltip">{tooltip}</div>}
+      {tooltipContent && <div className="map-tooltip">{tooltipContent}</div>}
     </div>
   );
+};
+
+SupplyChainMap.propTypes = {
+  mapData: PropTypes.array.isRequired,
 };
 
 export default SupplyChainMap;

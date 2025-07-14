@@ -1,56 +1,111 @@
-.map-container {
+/* --- MAP CARD CONTAINER & LAYOUT --- */
+.map-card-container {
   position: relative;
   width: 100%;
-  height: 400px;
-  background-color: #f0f5fa;
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border-color);
-  overflow: hidden; /* Important for containing the map */
+  height: 450px; /* A fixed height for layout consistency */
+  background-color: #f0f5fa; /* A professional, light blue map background */
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--walmart-gray-dark);
+  box-shadow: var(--shadow-md);
+  overflow: hidden; /* This is crucial for keeping the map contained */
+}
+
+.composable-map {
+  width: 100%;
+  height: 100%;
 }
 
 .geography-style {
-  fill: #e9ecef;
-  stroke: #ffffff;
-  stroke-width: 0.5;
+  fill: var(--walmart-gray-light);
+  stroke: var(--walmart-gray-dark);
+  stroke-width: 0.75;
   outline: none;
 }
 
+/* --- BASE MARKER STYLES --- */
 .map-marker {
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out;
+  opacity: 0; /* Initially hidden for staggered animation */
+  animation: marker-fade-in 0.5s ease forwards;
 }
-.map-marker:hover {
-  transform: scale(1.2);
+@keyframes marker-fade-in {
+  to { opacity: 1; }
 }
 
-.map-marker circle {
+.map-marker:hover {
+  transform: scale(1.3);
+  z-index: 10;
+}
+
+/* Base style for the visible colored circle */
+.marker-circle {
+  stroke: rgba(255, 255, 255, 0.8);
   stroke-width: 2;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
-@keyframes pulse-primary {
-  0% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.8); opacity: 0; }
-  100% { transform: scale(1); opacity: 0; }
+/* --- DYNAMIC RISK STYLES (COLORS) --- */
+.risk-high .marker-circle {
+  fill: var(--walmart-danger);
+}
+.risk-medium .marker-circle {
+  fill: var(--walmart-warning);
+}
+.risk-low .marker-circle {
+  fill: var(--walmart-success);
 }
 
-.marker-halo {
-  fill: var(--primary-blue);
-  opacity: 0;
-  transform-origin: center;
-  animation: pulse-primary 2s infinite ease-out;
+/* --- "PING" ANIMATION --- */
+@keyframes marker-ping-animation {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(3.5);
+    opacity: 0;
+  }
 }
 
+/* The animated circle that creates the ping effect */
+.marker-ping {
+  stroke-width: 2;
+  transform-origin: center; /* Ensures scale happens from the middle */
+  animation: marker-ping-animation 2s ease-out infinite;
+  animation-delay: inherit; /* Inherits the staggered delay from the parent group */
+}
+
+/* Match ping color to the risk level */
+.risk-high .marker-ping {
+  stroke: var(--walmart-danger);
+  fill: transparent;
+}
+.risk-medium .marker-ping {
+  stroke: var(--walmart-warning);
+  fill: transparent;
+}
+.risk-low .marker-ping {
+  stroke: var(--walmart-success);
+  fill: transparent;
+}
+
+
+/* --- POLISHED TOOLTIP --- */
 .map-tooltip {
   position: absolute;
   bottom: 20px;
-  left: 20px;
-  background-color: rgba(13, 26, 43, 0.8);
+  left: 50%;
+  transform: translateX(-50%); /* Center the tooltip */
+  background-color: rgba(1, 41, 95, 0.9); /* Dark blue, semi-transparent */
   color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: var(--border-radius-sm);
+  font-weight: 700;
   font-size: 0.9rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  box-shadow: var(--shadow-lg);
   pointer-events: none; /* Prevents the tooltip from blocking mouse events */
+  white-space: nowrap; /* Keep content on one line */
+  transition: opacity 0.2s ease;
+  z-index: 20;
 }

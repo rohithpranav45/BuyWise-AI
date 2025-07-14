@@ -285,3 +285,12 @@
   .rules-list li:hover { margin: 0 -24px; padding: 12px 24px 12px 40px; }
   .rules-list li.final-rule { margin: 8px -24px; padding: 16px 24px 16px 40px; }
 }
+
+/* ADD THIS AT THE END OF DeeperAnalysisDashboard.css */
+
+/* --- ENHANCED FACTOR GRID --- */
+.factor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}

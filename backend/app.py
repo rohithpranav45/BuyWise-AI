@@ -12,6 +12,7 @@ app = Flask(__name__)
 CORS(app)
 
 def load_json_data(filename):
+    """Loads JSON data from a file with specific error handling for each file type."""
     base_dir = os.path.abspath(os.path.dirname(__file__))
     filepath = os.path.join(base_dir, 'data', filename)
     try:
@@ -22,22 +23,24 @@ def load_json_data(filename):
 
 @app.route('/api/health')
 def health_check(): return jsonify({"status": "ok"})
+
 @app.route('/api/stores')
 def get_stores(): return jsonify(load_json_data('stores.json'))
+
 @app.route('/api/products')
 def get_products(): return jsonify(load_json_data('products.json'))
+
 @app.route('/api/tariffs')
 def get_tariffs(): return jsonify(load_json_data('tariffs.json'))
 
 @app.route('/api/dashboard')
 def get_dashboard_data():
     """Performs an instantaneous analysis on all products for the dashboard views."""
-    all_products = load_json_data('products.json')
-    all_tariffs = load_json_data('tariffs.json')
+    all_products, all_tariffs = load_json_data('products.json'), load_json_data('tariffs.json')
     dashboard_status = {}
     for product in all_products:
         tariff_rate = all_tariffs.get(product.get('countryOfOrigin'), {}).get(product.get('category'), 0.0)
-        result = get_procurement_recommendation(product, tariff_rate, 0.0, 0.0)
+        result = get_procurement_recommendation(product, tariff_rate, 0.0, 0.0) # Uses neutral demand/weather for speed
         dashboard_status[product['id']] = result['recommendation']
     return jsonify(dashboard_status)
 
@@ -64,7 +67,6 @@ def analyze_product():
 
         result = get_procurement_recommendation(product, tariff_rate, demand_signal, weather.get('weatherFactor', 0.0))
         
-        # --- Enrichment for Narrative and Supply Chain ---
         def get_risk_info(country, category):
             rate = all_tariffs.get(country, {}).get(category, 0.0)
             if rate > 0.15: return {"level": "High", "reason": f"Subject to a high {rate:.1%} tariff."}

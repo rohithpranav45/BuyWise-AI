@@ -58,82 +58,34 @@ function App() {
   };
 
   const runAnalysis = useCallback(async (productId, customInputs) => {
-    console.log('🚀 Starting runAnalysis for product:', productId);
-    console.log('🏪 Selected store:', selectedStore);
-    console.log('📝 Custom inputs:', customInputs);
-    
-    if (!selectedStore) {
-      console.error('❌ No selected store, aborting analysis');
-      return;
-    }
-    
-    if (!productId) {
-      console.error('❌ No product ID provided, aborting analysis');
-      return;
-    }
-    
-    console.log('⏳ Setting loading state to true');
+    if (!selectedStore) return;
     setLoading(prev => ({ ...prev, analysis: true }));
     setError(null);
-    
     try {
-      console.log('📡 Calling analyzeProduct API...');
       const response = await analyzeProduct(productId, selectedStore.id, customInputs);
-      console.log('✅ API response received:', response);
-      
-      if (!response || !response.data) {
-        throw new Error('Invalid response structure from API');
-      }
-      
-      console.log('💾 Setting analysis result:', response.data);
       setAnalysisResult(response.data);
-      console.log('✅ Analysis completed successfully');
-      
     } catch (err) {
-      console.error('❌ Analysis failed:', err);
-      console.error('❌ Error stack:', err.stack);
-      
       handleError(err, 'runAnalysis');
-      
-      // Create fallback result
-      const fallbackResult = { 
+      setAnalysisResult({ 
         recommendation: 'Error', 
-        analysis: { 
-          decisionNarrative: err.message || 'Could not connect to analysis engine.',
-          error: true
-        } 
-      };
-      
-      console.log('🔄 Setting fallback result:', fallbackResult);
-      setAnalysisResult(fallbackResult);
-      
+        analysis: { decisionNarrative: err.message || 'Could not connect to analysis engine.' } 
+      });
     } finally {
-      console.log('🏁 Analysis complete, resetting loading state');
-      // Add a small delay to ensure state updates are processed
-      setTimeout(() => {
-        setLoading(prev => ({ ...prev, analysis: false }));
-      }, 100);
+      setLoading(prev => ({ ...prev, analysis: false }));
     }
   }, [selectedStore]);
 
-  const handleProductSelect = useCallback((product) => {
+  const handleProductSelect = (product) => {
     if (!product || !product.id) return;
-    
-    console.log('📦 Product selected:', product.id);
     setSelectedProduct(product);
     setAnalysisResult(null);
-    setError(null);
-    
-    // Start analysis
     runAnalysis(product.id);
-  }, [runAnalysis]);
+  };
 
   const handleBackToProducts = useCallback(() => {
-    console.log('🔙 Returning to product list');
     setSelectedProduct(null);
     setAnalysisResult(null);
     setError(null);
-    setLoading(prev => ({ ...prev, analysis: false }));
   }, []);
 
   if (!selectedStore) {

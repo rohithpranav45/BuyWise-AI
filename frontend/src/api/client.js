@@ -22,9 +22,29 @@ const client = axios.create({
   },
 });
 
-// Interceptors for logging and error handling (no changes needed here)
-client.interceptors.request.use(/* ... */);
-client.interceptors.response.use(/* ... */);
+// Request interceptor
+client.interceptors.request.use(
+  (config) => {
+    console.log(`📤 Making ${config.method?.toUpperCase()} request to: ${config.url}`);
+    return config;
+  },
+  (error) => {
+    console.error('❌ Request error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor
+client.interceptors.response.use(
+  (response) => {
+    console.log(`✅ Response received from ${response.config.url}:`, response.data);
+    return response;
+  },
+  (error) => {
+    console.error('❌ Response error:', error);
+    return Promise.reject(error);
+  }
+);
 
 export const fetchStores = async () => {
   try {
@@ -58,16 +78,48 @@ export const fetchProducts = async () => {
 };
 
 export const analyzeProduct = async (productId, storeId, customInputs = {}) => {
-  // This function is now the only one needed for detailed view.
   try {
+    console.log('🔍 Starting analysis for product:', productId, 'store:', storeId);
+    console.log('📝 Custom inputs:', customInputs);
+    
     const requestData = { productId, storeId, ...customInputs };
     const response = await client.post('/analyze', requestData);
-    if (!response.data || !response.data.recommendation) {
-      throw new Error('Invalid analysis response from server');
+    
+    console.log('🎯 Raw API response:', response.data);
+    
+    // More flexible response validation
+    if (!response.data) {
+      throw new Error('No data received from analysis API');
     }
-    return { data: response.data };
+    
+    // Handle different response formats
+    let analysisData;
+    if (response.data.recommendation) {
+      // Direct format
+      analysisData = response.data;
+    } else if (response.data.data && response.data.data.recommendation) {
+      // Wrapped format
+      analysisData = response.data.data;
+    } else {
+      // Fallback - create a basic structure
+      analysisData = {
+        recommendation: response.data.recommendation || 'Unknown',
+        analysis: response.data.analysis || { 
+          decisionNarrative: 'Analysis completed but format may be unexpected.' 
+        }
+      };
+    }
+    
+    console.log('✅ Processed analysis data:', analysisData);
+    return { data: analysisData };
+    
   } catch (error) {
     console.error('❌ Failed to analyze product:', error);
+    console.error('❌ Error details:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data
+    });
     throw error;
   }
 };

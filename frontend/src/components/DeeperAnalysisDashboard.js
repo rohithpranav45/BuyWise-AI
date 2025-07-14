@@ -7,9 +7,9 @@ import './DeeperAnalysisDashboard.css';
 // A helper function to normalize a -1 to 1 score into a 0 to 1 percentile for the gauges
 const normalizeScore = (score = 0) => (score + 1) / 2;
 
-const DeeperAnalysisDashboard = ({ analysisData }) => {
+const DeeperAnalysisDashboard = ({ analysis, recommendation }) => {
   // A safety check for the entire data object to prevent crashes
-  if (!analysisData) {
+  if (!analysis) {
     return (
       <div className="intelligence-hub">
         <p className="loading-message">Loading intelligence report...</p>
@@ -22,12 +22,24 @@ const DeeperAnalysisDashboard = ({ analysisData }) => {
     scores = {}, 
     substitutes = [], 
     news_articles = [], 
-    supplyChainMapData = [] 
-  } = analysisData;
+    supplyChainMapData = [],
+    decisionNarrative = '',
+    rulesTriggered = [],
+    inputs = {}
+  } = analysis;
 
   return (
     <div className="intelligence-hub">
       <h3 className="hub-title">Intelligence Hub</h3>
+      
+      {/* --- RECOMMENDATION SECTION --- */}
+      <div className="hub-section">
+        <h4 className="section-title">Recommendation</h4>
+        <div className="recommendation-card">
+          <div className="recommendation-value">{recommendation}</div>
+          <div className="recommendation-narrative">{decisionNarrative}</div>
+        </div>
+      </div>
       
       {/* --- GAUGE SECTION --- */}
       <div className="hub-section">
@@ -38,6 +50,51 @@ const DeeperAnalysisDashboard = ({ analysisData }) => {
           <AnalysisGauge title="Urgency Score" value={normalizeScore(scores.urgencyScore)} />
         </div>
       </div>
+      
+      {/* --- INPUT VALUES SECTION --- */}
+      <div className="hub-section">
+        <h4 className="section-title">Analysis Inputs</h4>
+        <div className="inputs-grid">
+          <div className="input-item">
+            <label>Days of Stock:</label>
+            <span>{inputs.daysOfStock || 'N/A'}</span>
+          </div>
+          <div className="input-item">
+            <label>Inventory Level:</label>
+            <span>{inputs.inventoryLevel || 'N/A'}</span>
+          </div>
+          <div className="input-item">
+            <label>Sales Velocity:</label>
+            <span>{inputs.salesVelocity || 'N/A'}</span>
+          </div>
+          <div className="input-item">
+            <label>Tariff Rate:</label>
+            <span>{inputs.tariffRate ? `${(inputs.tariffRate * 100).toFixed(1)}%` : 'N/A'}</span>
+          </div>
+          <div className="input-item">
+            <label>Demand Signal:</label>
+            <span>{inputs.demandSignal ? inputs.demandSignal.toFixed(2) : 'N/A'}</span>
+          </div>
+          <div className="input-item">
+            <label>Weather Factor:</label>
+            <span>{inputs.weatherFactor ? inputs.weatherFactor.toFixed(2) : 'N/A'}</span>
+          </div>
+        </div>
+      </div>
+      
+      {/* --- RULES TRIGGERED SECTION --- */}
+      {rulesTriggered && rulesTriggered.length > 0 && (
+        <div className="hub-section">
+          <h4 className="section-title">Rules Triggered</h4>
+          <div className="rules-list">
+            {rulesTriggered.map((rule, index) => (
+              <div key={index} className="rule-item">
+                {rule}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       
       {/* --- SUPPLY CHAIN VISUALIZATION SECTION --- */}
       {/* This section only renders if the map data exists */}
@@ -90,7 +147,8 @@ const DeeperAnalysisDashboard = ({ analysisData }) => {
 };
 
 DeeperAnalysisDashboard.propTypes = {
-  analysisData: PropTypes.object,
+  analysis: PropTypes.object,
+  recommendation: PropTypes.string,
 };
 
 export default DeeperAnalysisDashboard;

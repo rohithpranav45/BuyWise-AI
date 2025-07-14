@@ -5,12 +5,8 @@ import ProductDetail from './components/ProductDetail';
 import Placeholder from './components/Placeholder';
 import DashboardSummary from './components/DashboardSummary';
 import StoreSelectorModal from './components/StoreSelectorModal';
-import CategorySelector from './components/CategorySelector'; // <-- The new component
-import { 
-  fetchProducts, 
-  analyzeProduct, 
-  fetchDashboardStatus
-} from './api/client';
+import CategorySelector from './components/CategorySelector';
+import { fetchProducts, analyzeProduct, fetchDashboardStatus } from './api/client';
 import './App.css';
 
 function App() {
@@ -29,12 +25,13 @@ function App() {
     } catch { return null; }
   });
 
-  // --- NEW: State for the selected category ---
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const handleError = (err, ctx) => console.error(`Error in ${ctx}:`, err);
+  const handleError = (err, ctx) => {
+    console.error(`Error in ${ctx}:`, err);
+    setError(err.message || 'An unexpected error occurred.');
+  };
 
-  // This effect fetches product and status data after a store is selected.
   useEffect(() => {
     if (selectedStore) {
       setLoading(prev => ({ ...prev, app: true }));
@@ -52,48 +49,97 @@ function App() {
     localStorage.setItem('selectedStore', JSON.stringify(store));
     setSelectedStore(store);
   };
-
+  
   const handleBackToStoreSelect = () => {
     localStorage.removeItem('selectedStore');
     setSelectedStore(null);
-    setSelectedCategory(null); // Ensure everything resets
+    setSelectedCategory(null);
     setProducts([]);
   };
 
   const runAnalysis = useCallback(async (productId, customInputs) => {
-    if (!selectedStore) return;
+    console.log('🚀 Starting runAnalysis for product:', productId);
+    console.log('🏪 Selected store:', selectedStore);
+    console.log('📝 Custom inputs:', customInputs);
+    
+    if (!selectedStore) {
+      console.error('❌ No selected store, aborting analysis');
+      return;
+    }
+    
+    if (!productId) {
+      console.error('❌ No product ID provided, aborting analysis');
+      return;
+    }
+    
+    console.log('⏳ Setting loading state to true');
     setLoading(prev => ({ ...prev, analysis: true }));
     setError(null);
+    
     try {
+      console.log('📡 Calling analyzeProduct API...');
       const response = await analyzeProduct(productId, selectedStore.id, customInputs);
+      console.log('✅ API response received:', response);
+      
+      if (!response || !response.data) {
+        throw new Error('Invalid response structure from API');
+      }
+      
+      console.log('💾 Setting analysis result:', response.data);
       setAnalysisResult(response.data);
+      console.log('✅ Analysis completed successfully');
+      
     } catch (err) {
+      console.error('❌ Analysis failed:', err);
+      console.error('❌ Error stack:', err.stack);
+      
       handleError(err, 'runAnalysis');
+      
+      // Create fallback result
+      const fallbackResult = { 
+        recommendation: 'Error', 
+        analysis: { 
+          decisionNarrative: err.message || 'Could not connect to analysis engine.',
+          error: true
+        } 
+      };
+      
+      console.log('🔄 Setting fallback result:', fallbackResult);
+      setAnalysisResult(fallbackResult);
+      
     } finally {
-      setLoading(prev => ({ ...prev, analysis: false }));
+      console.log('🏁 Analysis complete, resetting loading state');
+      // Add a small delay to ensure state updates are processed
+      setTimeout(() => {
+        setLoading(prev => ({ ...prev, analysis: false }));
+      }, 100);
     }
   }, [selectedStore]);
 
-  const handleProductSelect = (product) => {
+  const handleProductSelect = useCallback((product) => {
     if (!product || !product.id) return;
+    
+    console.log('📦 Product selected:', product.id);
     setSelectedProduct(product);
     setAnalysisResult(null);
+    setError(null);
+    
+    // Start analysis
     runAnalysis(product.id);
-  };
+  }, [runAnalysis]);
 
   const handleBackToProducts = useCallback(() => {
+    console.log('🔙 Returning to product list');
     setSelectedProduct(null);
     setAnalysisResult(null);
     setError(null);
+    setLoading(prev => ({ ...prev, analysis: false }));
   }, []);
 
-  // --- NEW HIERARCHICAL RENDERING ---
-  // Level 1: If no store is selected, show the store selector.
   if (!selectedStore) {
     return <StoreSelectorModal onStoreSelect={handleStoreSelect} />;
   }
 
-  // Level 2: If a store is selected but no category, show the category selector.
   if (!selectedCategory) {
     return (
       <CategorySelector
@@ -104,8 +150,7 @@ function App() {
       />
     );
   }
-  
-  // Level 3: If both are selected, render the main application dashboard.
+
   return (
     <div className="app-container">
       <Header store={selectedStore} onChangeStore={handleBackToStoreSelect} />
@@ -114,7 +159,7 @@ function App() {
           selectedProduct ? (
             <ProductDetail 
               product={selectedProduct} 
-              analysis={analysisResult}
+              analysisResult={analysisResult}
               isLoading={loading.analysis}
               onBack={handleBackToProducts}
               onRerunAnalysis={runAnalysis}
@@ -122,14 +167,15 @@ function App() {
           ) : (
             <>
               <DashboardSummary 
+                products={products.filter(p => p.category === selectedCategory)}
                 statuses={dashboardStatus}
                 activeFilter={activeFilter}
                 onFilterChange={setActiveFilter}
                 selectedCategory={selectedCategory}
-                onBackToCategories={() => setSelectedCategory(null)} // Provide the reset handler
+                onBackToCategories={() => setSelectedCategory(null)}
               />
               <ProductList 
-                products={products.filter(p => p.category === selectedCategory)} // Filter products by selected category
+                products={products.filter(p => p.category === selectedCategory)}
                 onProductSelect={handleProductSelect}
                 statuses={dashboardStatus}
                 filter={activeFilter}

@@ -2,21 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './DashboardSummary.css';
 
-const RECOMMENDATION_ORDER = [
-  'Bulk Order', 'Standard Order', 'Use Substitute', 'Hold', 'Monitor', 'Deprioritize', 'Error'
-];
-
-const DashboardSummary = ({ statuses, activeFilter, onFilterChange, selectedCategory, onBackToCategories }) => {
-  // Calculate counts for each recommendation type
-  const counts = Object.values(statuses).reduce((acc, status) => {
-    acc[status] = (acc[status] || 0) + 1;
+const DashboardSummary = ({ products, statuses, activeFilter, onFilterChange, selectedCategory, onBackToCategories }) => {
+  const counts = products.reduce((acc, product) => {
+    const status = statuses[product.id];
+    if (status) {
+      acc[status] = (acc[status] || 0) + 1;
+    }
     return acc;
   }, {});
   
-  // Create a nicer display name, e.g., "Canned Goods" -> "Canned Goods"
   const categoryDisplayName = selectedCategory.replace(/_/g, ' ');
-
-  const totalProducts = Object.keys(statuses).length;
 
   return (
     <div className="dashboard-summary">
@@ -29,22 +24,19 @@ const DashboardSummary = ({ statuses, activeFilter, onFilterChange, selectedCate
           onClick={() => onFilterChange('All')}
           className={`filter-badge all ${activeFilter === 'All' ? 'active' : ''}`}
         >
-          All Products ({totalProducts})
+          All Products ({products.length})
         </button>
-        {RECOMMENDATION_ORDER.map(rec => {
-          if (counts[rec]) {
-            const className = rec.toLowerCase().replace(/ /g, '-');
-            return (
-              <button
-                key={rec}
-                onClick={() => onFilterChange(rec)}
-                className={`filter-badge ${className} ${activeFilter === rec ? 'active' : ''}`}
-              >
-                {rec} ({counts[rec]})
-              </button>
-            );
-          }
-          return null;
+        {Object.entries(counts).map(([status, count]) => {
+          const className = status.toLowerCase().replace(/ /g, '-');
+          return (
+            <button
+              key={status}
+              onClick={() => onFilterChange(status)}
+              className={`filter-badge ${className} ${activeFilter === status ? 'active' : ''}`}
+            >
+              {status} ({count})
+            </button>
+          );
         })}
       </div>
     </div>
@@ -52,6 +44,7 @@ const DashboardSummary = ({ statuses, activeFilter, onFilterChange, selectedCate
 };
 
 DashboardSummary.propTypes = {
+  products: PropTypes.array.isRequired,
   statuses: PropTypes.object.isRequired,
   activeFilter: PropTypes.string.isRequired,
   onFilterChange: PropTypes.func.isRequired,

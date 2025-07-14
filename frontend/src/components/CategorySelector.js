@@ -6,7 +6,7 @@ const URGENT_STATUSES = ['Bulk Order', 'Use Substitute'];
 
 const CategorySelector = ({ products, statuses, onCategorySelect, onBackToStoreSelect }) => {
   const categoriesWithCounts = CATEGORY_DATA.map(category => {
-    const urgentCount = products.filter(p =>
+    const urgentCount = products.filter(p => 
       p.category === category.id && URGENT_STATUSES.includes(statuses[p.id])
     ).length;
     return { ...category, urgentCount };
@@ -21,9 +21,9 @@ const CategorySelector = ({ products, statuses, onCategorySelect, onBackToStoreS
       </header>
       <div className="category-grid">
         {categoriesWithCounts.map(cat => (
-          <div
-            key={cat.id}
-            className="category-card"
+          <div 
+            key={cat.id} 
+            className="category-card" 
             onClick={() => onCategorySelect(cat.id)}
             style={{ backgroundImage: `url(${process.env.PUBLIC_URL + cat.imageUrl})` }}
           >

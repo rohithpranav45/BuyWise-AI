@@ -1,27 +1,46 @@
+/* --- THEME & BACKGROUND --- */
+/* This now uses the exact same theme as the Store Selector for perfect consistency */
 .category-selector-container {
   width: 100%;
   min-height: 100vh;
   padding: 40px;
   box-sizing: border-box;
-  background-color: #0d1a2b;
   color: white;
   animation: fadeIn 0.5s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* --- vvvvvv THIS IS THE CORRECTED BACKGROUND vvvvvv --- */
+  background-color: #0d1a2b;
+  background-image: 
+    linear-gradient(rgba(1, 41, 95, 0.8), rgba(1, 41, 95, 0.8)),
+    radial-gradient(ellipse at bottom, #002D62, #0d1a2b);
+  /* --- ^^^^^^ END OF BACKGROUND FIX ^^^^^^ --- */
 }
 
+/* --- HEADER STYLING --- */
 .category-header {
   text-align: center;
   margin-bottom: 40px;
+  width: 100%;
+  max-width: 1200px;
 }
 
 .category-header h1 {
   font-size: 3rem;
   font-weight: 700;
   margin: 0;
+  color: var(--text-on-dark);
+}
+
+.category-header .spark {
+  color: var(--spark-yellow);
 }
 
 .category-header p {
   font-size: 1.2rem;
-  opacity: 0.7;
+  color: rgba(255, 255, 255, 0.7);
   margin: 10px 0 20px 0;
 }
 
@@ -41,36 +60,38 @@
   border-color: white;
 }
 
+/* --- THE 3x2 GRID ALIGNMENT --- */
 .category-grid {
+  width: 100%;
+  max-width: 1200px;
   display: grid;
-  /* Use a more balanced minmax for better responsiveness */
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 30px;
+}
+
+/* Wrapper for the hover-rotate effect */
+.category-card-wrapper {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.category-card-wrapper:hover {
+  transform: translateY(-15px) rotate(3deg);
 }
 
 .category-card {
   position: relative;
-  /* --- CARD SIZING AND ALIGNMENT FIX --- */
-  /* Using aspect-ratio for consistent, responsive shaping */
-  aspect-ratio: 3 / 4; 
-  display: flex; /* Enables easy alignment of child content */
-  flex-direction: column;
-  justify-content: flex-end; /* Pushes content to the bottom */
-  
+  aspect-ratio: 4 / 5;
   border-radius: var(--border-radius);
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: 0 10px 20px rgba(0,0,0,0.3);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  
-  /* Background image properties are crucial */
   background-size: cover;
   background-position: center;
+  transition: transform 0.6s ease-out;
 }
 
-.category-card:hover {
-  transform: translateY(-15px) rotate(3deg);
+.category-card-wrapper:hover .category-card {
+  transform: scale(1.1);
   box-shadow: 0 25px 50px rgba(0,0,0,0.6);
 }
 
@@ -78,16 +99,16 @@
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
   background: linear-gradient(to top, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0) 60%);
-  transition: background 0.4s ease-in-out;
-}
-
-.category-card:hover .card-overlay {
-  background: linear-gradient(to top, rgba(0,0,0,0.7) 5%, rgba(0,0,0,0) 50%);
 }
 
 .card-content {
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  height: 100%;
   padding: 24px;
   box-sizing: border-box;
   text-align: left;
@@ -101,7 +122,7 @@
 
 .card-title {
   margin: 0;
-  font-size: 1.8rem; /* Adjusted for better fit in smaller card */
+  font-size: 1.8rem;
   font-weight: 700;
   color: white;
   line-height: 1.2;
@@ -125,4 +146,17 @@
   0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 194, 32, 0.7); }
   70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 194, 32, 0); }
   100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 194, 32, 0); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .category-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
 }

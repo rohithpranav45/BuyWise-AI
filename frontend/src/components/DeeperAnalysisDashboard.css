@@ -1,129 +1,287 @@
+/* --- WALMART BRAND COLORS & VARIABLES (No Changes) --- */
+:root {
+  --walmart-blue: #004c91;
+  --walmart-blue-light: #0066cc;
+  --walmart-blue-dark: #003366;
+  --walmart-yellow: #ffc220;
+  --walmart-yellow-light: #ffdd44;
+  --walmart-yellow-dark: #e6a600;
+  --walmart-gray: #f8f9fa;
+  --walmart-gray-light: #ffffff;
+  --walmart-gray-dark: #e9ecef;
+  --walmart-text-primary: #1a1a1a;
+  --walmart-text-secondary: #666666;
+  --walmart-text-light: #999999;
+  --walmart-success: #28a745;
+  --walmart-warning: #ffc107;
+  --walmart-danger: #dc3545;
+  --walmart-info: #17a2b8;
+  
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --shadow-xl: 0 16px 48px rgba(0,0,0,0.15);
+  
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  --border-radius-sm: 6px;
+  --border-radius: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 24px;
+}
+
+/* --- INTELLIGENCE HUB MAIN CONTAINER --- */
 .intelligence-hub {
   margin-top: 32px;
+  padding: 0 24px; /* INCREASED PADDING for better spacing */
+  max-width: 1600px; /* INCREASED MAX-WIDTH to accommodate content */
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box; /* Ensure padding is included in the width */
 }
 
 .hub-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  padding-bottom: 16px;
-  margin-bottom: 24px;
-  border-bottom: 3px solid var(--spark-yellow);
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--walmart-blue);
+  padding-bottom: 24px;
+  margin-bottom: 40px;
+  text-align: center;
+  position: relative;
+}
+
+.hub-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--walmart-blue), var(--walmart-yellow));
+  border-radius: 2px;
+}
+
+/* --- vvvvvv THE CORRECTED & FLUID GRID LAYOUT vvvvvv --- */
+.intelligence-hub-layout {
+  display: grid;
+  /* This is the key change: it creates a flexible layout */
+  grid-template-columns: minmax(0, 2fr) minmax(380px, 1fr);
+  gap: 40px; /* Consistent gap for both rows and columns */
+  align-items: start;
+}
+
+/* Switches to a single column on smaller screens */
+@media (max-width: 1200px) {
+  .intelligence-hub-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+/* --- ^^^^^^ END OF GRID CORRECTION ^^^^^^ --- */
+
+
+.main-column, .sidebar-column {
+  display: flex;
+  flex-direction: column;
+  gap: 40px; /* Consistent vertical spacing between sections */
 }
 
 .hub-section {
-  margin-bottom: 32px;
+  width: 100%;
+  opacity: 0;
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.hub-section:nth-child(1) { animation-delay: 0.1s; }
+.hub-section:nth-child(2) { animation-delay: 0.2s; }
+.hub-section:nth-child(3) { animation-delay: 0.3s; }
+.hub-section:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .section-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 16px;
-}
-
-/* --- Gauge Grid Styles --- */
-.gauge-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 24px;
-}
-
-/* --- Live Demand Intel (News) Styles --- */
-.news-feed {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.news-card {
-  display: block;
-  background-color: var(--light-theme-surface);
-  border: 1px solid var(--border-color);
-  border-left: 5px solid var(--primary-blue);
-  padding: 16px;
-  border-radius: var(--border-radius);
-  text-decoration: none;
-  transition: var(--transition-base);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-}
-
-.news-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
-  border-left-color: var(--spark-yellow);
-}
-
-.news-source {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.news-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
-.news-link {
   font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--primary-blue);
-}
-
-/* --- Strategic Substitutes Styles --- */
-.substitute-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
-}
-
-.substitute-card {
-  background-color: var(--light-theme-surface);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  padding: 16px;
-  transition: var(--transition-base);
-}
-
-.substitute-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--primary-blue);
-}
-
-.substitute-card h5 {
-  margin: 0 0 4px 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.substitute-card p {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin: 0 0 12px 0;
-}
-
-.similarity-metric {
-  display: inline-block;
-  background-color: #e9f5ff; /* A light, complementary blue */
-  color: #005a9c; /* A strong blue text color */
-  padding: 4px 10px;
-  border-radius: 20px;
   font-weight: 700;
-  font-size: 0.8rem;
+  color: var(--walmart-blue);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--walmart-gray-dark);
 }
 
-.loading-message {
+.section-title::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(135deg, var(--walmart-blue), var(--walmart-yellow));
+  border-radius: 2px;
+}
+
+
+/* --- HERO RECOMMENDATION CARD (No Changes) --- */
+.hero-card {
+  display: flex;
+  align-items: center;
+  gap: 32px;
   padding: 40px;
-  text-align: center;
-  font-size: 1.1rem;
-  color: var(--text-secondary);
+  border-radius: var(--border-radius-xl);
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-xl);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+  min-height: 140px;
+}
+.hero-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hero-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-xl), 0 20px 40px rgba(0,0,0,0.15);
+}
+.hero-icon {
+  font-size: 3rem; line-height: 1; padding: 20px;
+  background: rgba(255,255,255,0.15); border-radius: var(--border-radius-lg);
+  backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
+}
+.hero-icon svg { width: 56px; height: 56px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+.hero-text h4 { margin: 0 0 8px 0; font-size: 2.2rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.hero-text p { margin: 0; font-size: 1.1rem; opacity: 0.95; max-width: 600px; line-height: 1.6; font-weight: 400; }
+.decision-bulk-order { background: linear-gradient(135deg, var(--walmart-success) 0%, #20c997 100%); }
+.decision-standard-order { background: linear-gradient(135deg, var(--walmart-blue) 0%, var(--walmart-blue-light) 100%); }
+.decision-use-substitute { background: linear-gradient(135deg, #fd7e14 0%, #e55a4f 100%); }
+.decision-hold { background: linear-gradient(135deg, var(--walmart-yellow) 0%, #ffd700 100%); color: var(--walmart-text-primary); }
+.decision-monitor { background: linear-gradient(135deg, #6c757d 0%, #495057 100%); }
+.decision-deprioritize { background: linear-gradient(135deg, var(--walmart-danger) 0%, #c82333 100%); }
+.decision-error { background: linear-gradient(135deg, #343a40 0%, #212529 100%); }
+
+
+/* --- vvvvvv CORRECTED ANALYSIS BREAKDOWN CARD vvvvvv --- */
+.breakdown-card {
+  background: var(--walmart-gray-light);
+  border: 1px solid var(--walmart-gray-dark);
+  border-radius: var(--border-radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden; /* CRITICAL FIX: This contains the hover effects */
+}
+/* --- ^^^^^^ END OF BREAKDOWN CARD CORRECTION ^^^^^^ --- */
+
+.breakdown-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--walmart-blue), var(--walmart-yellow));
+}
+.breakdown-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.breakdown-card h5 { margin: 0 0 20px 0; font-size: 1.1rem; font-weight: 700; color: var(--walmart-blue); text-transform: uppercase; letter-spacing: 0.5px; }
+.breakdown-card hr { border: none; border-top: 1px solid var(--walmart-gray-dark); margin: 24px 0; }
+.inputs-list, .rules-list { list-style: none; padding: 0; margin: 0; font-size: 0.95rem; }
+.inputs-list li {
+  color: var(--walmart-text-secondary); padding: 12px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--walmart-gray-dark); transition: all var(--transition-fast);
+}
+.inputs-list li:last-child { border-bottom: none; }
+/* This hover is safe now due to overflow:hidden on the parent */
+.inputs-list li:hover { background: var(--walmart-gray); margin: 0 -32px; padding: 12px 32px; }
+.input-label { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.input-label svg { color: var(--walmart-blue); opacity: 0.7; }
+.inputs-list li strong {
+  color: var(--walmart-blue); font-weight: 700; background: var(--walmart-gray);
+  padding: 4px 12px; border-radius: var(--border-radius-sm); border: 1px solid var(--walmart-gray-dark);
+}
+.rules-list li {
+  padding: 12px 0 12px 32px; position: relative; justify-content: flex-start;
+  color: var(--walmart-text-secondary); line-height: 1.5; transition: all var(--transition-fast);
+}
+/* This hover is safe now due to overflow:hidden on the parent */
+.rules-list li:hover {
+  color: var(--walmart-blue); background: var(--walmart-gray);
+  margin: 0 -32px; padding: 12px 32px 12px 48px;
+}
+.rules-list li::before { content: '•'; position: absolute; left: 12px; color: var(--walmart-blue-light); font-weight: bold; font-size: 1.2rem; }
+.rules-list li.final-rule {
+  font-weight: 700; color: var(--walmart-blue); background: var(--walmart-gray);
+  margin: 8px -32px; padding: 16px 32px 16px 48px;
+  border-top: 1px solid var(--walmart-yellow); border-bottom: 1px solid var(--walmart-yellow);
+  box-shadow: var(--shadow-sm);
+}
+.rules-list li.final-rule::before { content: '⚡'; color: var(--walmart-yellow); font-size: 1.4rem; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+/* --- GAUGE GRID --- */
+.gauge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 768px) { .gauge-grid { grid-template-columns: 1fr; } }
+
+
+/* --- NEWS FEED & SUBSTITUTE GRID --- */
+.news-feed, .substitute-grid { display: flex; flex-direction: column; gap: 16px; }
+
+.news-card, .substitute-card {
+  background: var(--walmart-gray-light); border: 1px solid var(--walmart-gray-dark);
+  padding: 24px; border-radius: var(--border-radius-lg); text-decoration: none;
+  transition: all var(--transition-base); position: relative; overflow: hidden;
+}
+.news-card:hover, .substitute-card:hover {
+  transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--walmart-blue);
+}
+.news-source {
+  font-size: 0.8rem; font-weight: 700; color: var(--walmart-blue);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; opacity: 0.8;
+}
+.news-title { font-size: 1rem; font-weight: 600; color: var(--walmart-text-primary); line-height: 1.4; margin: 0; }
+.substitute-card h5 { margin: 0 0 8px 0; font-size: 1.1rem; font-weight: 700; color: var(--walmart-blue); }
+.substitute-card p { font-size: 0.9rem; color: var(--walmart-text-secondary); margin: 0 0 16px 0; line-height: 1.4; }
+.similarity-metric {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, var(--walmart-blue), var(--walmart-blue-light)); color: white;
+  padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;
+  box-shadow: var(--shadow-sm); transition: all var(--transition-base);
+}
+.similarity-metric:hover { transform: scale(1.05); box-shadow: var(--shadow-md); }
+.similarity-metric::before { content: '🎯'; font-size: 1rem; }
+
+/* --- LOADING STATE (No Changes) --- */
+.loading-message {
+  padding: 80px 40px; text-align: center; font-size: 1.2rem; color: var(--walmart-text-secondary);
+  background: var(--walmart-gray-light); border-radius: var(--border-radius-lg); border: 2px dashed var(--walmart-gray-dark); position: relative;
+}
+.loading-message::before {
+  content: ''; width: 40px; height: 40px; border: 4px solid var(--walmart-gray-dark);
+  border-top: 4px solid var(--walmart-blue); border-radius: 50%; animation: spin 1s linear infinite;
+  margin: 0 auto 20px; display: block;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* --- RESPONSIVE DESIGN (Adjusted for better flow) --- */
+@media (max-width: 768px) {
+  .intelligence-hub { padding: 0 16px; }
+  .hub-title { font-size: 2rem; }
+  .hero-card { flex-direction: column; text-align: center; gap: 24px; padding: 32px 24px; }
+  .hero-text h4 { font-size: 1.8rem; }
+  .hero-text p { font-size: 1rem; }
+  .breakdown-card { padding: 24px; }
+  /* Adjust hover margins for smaller padding */
+  .inputs-list li:hover { margin: 0 -24px; padding: 12px 24px; }
+  .rules-list li:hover { margin: 0 -24px; padding: 12px 24px 12px 40px; }
+  .rules-list li.final-rule { margin: 8px -24px; padding: 16px 24px 16px 40px; }
 }

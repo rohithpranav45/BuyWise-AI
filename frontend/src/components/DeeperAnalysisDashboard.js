@@ -1,147 +1,324 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import AnalysisGauge from './AnalysisGauge';         // The new gauge component
-import SupplyChainMap from './SupplyChainMap';       // The new map component
+import AnalysisGauge from './AnalysisGauge';
+import SupplyChainMap from './SupplyChainMap';
 import './DeeperAnalysisDashboard.css';
 
-// A helper function to normalize a -1 to 1 score into a 0 to 1 percentile for the gauges
+// --- ENHANCED RECOMMENDATION STYLES & ICONS ---
+const getRecommendationStyle = (recommendation) => {
+  const styles = {
+    "Bulk Order": {
+      className: 'decision-bulk-order',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M7 12l3 3 7-7" />
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        </svg>
+      ),
+      description: "Optimal time to secure bulk pricing and maximize cost efficiency"
+    },
+    "Standard Order": {
+      className: 'decision-standard-order',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      ),
+      description: "Standard procurement approach recommended for current market conditions"
+    },
+    "Use Substitute": {
+      className: 'decision-use-substitute',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 12h16M4 12l6-6M4 12l6 6M20 12l-6 6M20 12l-6-6"/>
+        </svg>
+      ),
+      description: "Alternative products available with better value proposition"
+    },
+    "Hold": {
+      className: 'decision-hold',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"/>
+          <path d="M12 8v4l2 1"/>
+        </svg>
+      ),
+      description: "Market conditions suggest waiting for better opportunities"
+    },
+    "Monitor": {
+      className: 'decision-monitor',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      ),
+      description: "Continue monitoring market signals for optimal timing"
+    },
+    "Deprioritize": {
+      className: 'decision-deprioritize',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+          <path d="m15 9-6 6"/>
+          <path d="m9 9 6 6"/>
+        </svg>
+      ),
+      description: "Focus resources on higher-priority procurement opportunities"
+    },
+    "Error": {
+      className: 'decision-error',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      ),
+      description: "Unable to process recommendation - please review input data"
+    }
+  };
+  return styles[recommendation] || styles["Error"];
+};
+
+// --- HELPER FUNCTIONS ---
 const normalizeScore = (score = 0) => (score + 1) / 2;
 
+const formatValue = (value, type = 'number') => {
+  if (value === null || value === undefined) return 'N/A';
+  
+  switch (type) {
+    case 'percentage':
+      return `${(value * 100).toFixed(1)}%`;
+    case 'decimal':
+      return value.toFixed(2);
+    case 'currency':
+      return `$${value.toLocaleString()}`;
+    case 'days':
+      return `${value.toFixed(1)} days`;
+    default:
+      return value.toString();
+  }
+};
+
+const getMetricIcon = (metric) => {
+  const icons = {
+    'Days of Stock': (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+        <line x1="12" y1="22.08" x2="12" y2="12"/>
+      </svg>
+    ),
+    'Tariff Rate': (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <line x1="12" y1="1" x2="12" y2="23"/>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+    ),
+    'Demand Signal': (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+      </svg>
+    ),
+    'Weather Factor': (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+      </svg>
+    )
+  };
+  return icons[metric] || null;
+};
+
+// --- ENHANCED COMPONENT ---
 const DeeperAnalysisDashboard = ({ analysis, recommendation }) => {
-  // A safety check for the entire data object to prevent crashes
-  if (!analysis) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [animatedValues, setAnimatedValues] = useState({});
+
+  useEffect(() => {
+    if (analysis) {
+      setIsLoading(false);
+      // Animate values on load
+      const timer = setTimeout(() => {
+        setAnimatedValues(analysis.inputs || {});
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [analysis]);
+
+  if (isLoading || !analysis) {
     return (
       <div className="intelligence-hub">
-        <p className="loading-message">Loading intelligence report...</p>
+        <div className="loading-message">
+          Analyzing market intelligence and generating recommendations...
+        </div>
       </div>
     );
   }
 
-  // Destructure all needed properties from the analysis data, with safe defaults
-  const { 
-    scores = {}, 
-    substitutes = [], 
-    news_articles = [], 
+  const {
+    scores = {},
+    substitutes = [],
+    news_articles = [],
     supplyChainMapData = [],
     decisionNarrative = '',
     rulesTriggered = [],
     inputs = {}
   } = analysis;
+  
+  const heroStyle = getRecommendationStyle(recommendation);
+
+  // Enhanced input data with better formatting
+  const enhancedInputs = [
+    {
+      label: 'Days of Stock',
+      value: inputs.daysOfStock,
+      type: 'days',
+      icon: getMetricIcon('Days of Stock')
+    },
+    {
+      label: 'Tariff Rate',
+      value: inputs.tariffRate,
+      type: 'percentage',
+      icon: getMetricIcon('Tariff Rate')
+    },
+    {
+      label: 'Demand Signal',
+      value: inputs.demandSignal,
+      type: 'decimal',
+      icon: getMetricIcon('Demand Signal')
+    },
+    {
+      label: 'Weather Factor',
+      value: inputs.weatherFactor,
+      type: 'decimal',
+      icon: getMetricIcon('Weather Factor')
+    }
+  ];
 
   return (
     <div className="intelligence-hub">
       <h3 className="hub-title">Intelligence Hub</h3>
       
-      {/* --- RECOMMENDATION SECTION --- */}
-      <div className="hub-section">
-        <h4 className="section-title">Recommendation</h4>
-        <div className="recommendation-card">
-          <div className="recommendation-value">{recommendation}</div>
-          <div className="recommendation-narrative">{decisionNarrative}</div>
-        </div>
-      </div>
-      
-      {/* --- GAUGE SECTION --- */}
-      <div className="hub-section">
-        <h4 className="section-title">Core Factor Analysis</h4>
-        <div className="gauge-grid">
-          <AnalysisGauge title="Cost Impact" value={normalizeScore(scores.costImpactScore)} />
-          <AnalysisGauge title="Demand Signal" value={normalizeScore(scores.demandScore)} />
-          <AnalysisGauge title="Urgency Score" value={normalizeScore(scores.urgencyScore)} />
-        </div>
-      </div>
-      
-      {/* --- INPUT VALUES SECTION --- */}
-      <div className="hub-section">
-        <h4 className="section-title">Analysis Inputs</h4>
-        <div className="inputs-grid">
-          <div className="input-item">
-            <label>Days of Stock:</label>
-            <span>{inputs.daysOfStock || 'N/A'}</span>
+      <div className="intelligence-hub-layout">
+        
+        {/* === MAIN CONTENT COLUMN === */}
+        <div className="main-column">
+          
+          {/* --- Enhanced Hero Recommendation Card --- */}
+          <div className={`hero-card ${heroStyle.className}`}>
+            <div className="hero-icon">{heroStyle.icon}</div>
+            <div className="hero-text">
+              <h4>{recommendation}</h4>
+              <p>{decisionNarrative || heroStyle.description}</p>
+            </div>
           </div>
-          <div className="input-item">
-            <label>Inventory Level:</label>
-            <span>{inputs.inventoryLevel || 'N/A'}</span>
-          </div>
-          <div className="input-item">
-            <label>Sales Velocity:</label>
-            <span>{inputs.salesVelocity || 'N/A'}</span>
-          </div>
-          <div className="input-item">
-            <label>Tariff Rate:</label>
-            <span>{inputs.tariffRate ? `${(inputs.tariffRate * 100).toFixed(1)}%` : 'N/A'}</span>
-          </div>
-          <div className="input-item">
-            <label>Demand Signal:</label>
-            <span>{inputs.demandSignal ? inputs.demandSignal.toFixed(2) : 'N/A'}</span>
-          </div>
-          <div className="input-item">
-            <label>Weather Factor:</label>
-            <span>{inputs.weatherFactor ? inputs.weatherFactor.toFixed(2) : 'N/A'}</span>
-          </div>
-        </div>
-      </div>
-      
-      {/* --- RULES TRIGGERED SECTION --- */}
-      {rulesTriggered && rulesTriggered.length > 0 && (
-        <div className="hub-section">
-          <h4 className="section-title">Rules Triggered</h4>
-          <div className="rules-list">
-            {rulesTriggered.map((rule, index) => (
-              <div key={index} className="rule-item">
-                {rule}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {/* --- SUPPLY CHAIN VISUALIZATION SECTION --- */}
-      {/* This section only renders if the map data exists */}
-      {supplyChainMapData && supplyChainMapData.length > 0 && (
-        <div className="hub-section">
-          <h4 className="section-title">Supply Chain Visualization</h4>
-          <SupplyChainMap mapData={supplyChainMapData} />
-        </div>
-      )}
-      
-      {/* --- LIVE DEMAND INTEL (NEWS) SECTION --- */}
-      {/* This section only renders if there are news articles to show */}
-      {news_articles && news_articles.length > 0 && (
-        <div className="hub-section">
-          <h4 className="section-title">Live Demand Intel</h4>
-          <div className="news-feed">
-            {news_articles.map((article, index) => (
-              <a href={article.url} target="_blank" rel="noopener noreferrer" className="news-card" key={index}>
-                <div className="news-source">{article.source || 'Online Publication'}</div>
-                <div className="news-title">{article.title}</div>
-                <div className="news-link">Read Source Article →</div>
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
+          
+          {/* --- Supply Chain Map --- */}
+          {supplyChainMapData && supplyChainMapData.length > 0 && (
+            <div className="hub-section">
+              <h4 className="section-title">Supply Chain Visualization</h4>
+              <SupplyChainMap mapData={supplyChainMapData} />
+            </div>
+          )}
 
-      {/* --- STRATEGIC SUBSTITUTES SECTION --- */}
-      {/* This section will only render if there are substitutes available */}
-      {substitutes && substitutes.length > 0 && (
-        <div className="hub-section">
-          <h4 className="section-title">Strategic Substitutes</h4>
-          <div className="substitute-grid">
-            {substitutes.map(item => (
-              <div key={item.id} className="substitute-card">
-                <h5>{item.name}</h5>
-                <p>SKU: {item.sku}</p>
-                <div className="substitute-metrics">
-                  <span className="similarity-metric">
-                    ~{(item.similarity * 100).toFixed(0)}% Match
-                  </span>
-                </div>
-              </div>
-            ))}
+          {/* --- Enhanced Core Factor Gauges --- */}
+          <div className="hub-section">
+            <h4 className="section-title">Core Factor Analysis</h4>
+            <div className="gauge-grid">
+              <AnalysisGauge 
+                title="Cost Impact" 
+                value={normalizeScore(scores.costImpactScore)}
+                subtitle="Market cost efficiency"
+              />
+              <AnalysisGauge 
+                title="Demand Signal" 
+                value={normalizeScore(scores.demandScore)}
+                subtitle="Market demand strength"
+              />
+              <AnalysisGauge 
+                title="Urgency" 
+                value={normalizeScore(scores.urgencyScore)}
+                subtitle="Time-sensitive priority"
+              />
+            </div>
           </div>
         </div>
-      )}
+
+        {/* === SIDEBAR COLUMN === */}
+        <div className="sidebar-column">
+
+          {/* --- Enhanced Analysis Breakdown Card --- */}
+          <div className="hub-section">
+            <h4 className="section-title">Analysis Breakdown</h4>
+            <div className="breakdown-card">
+              <h5>Key Market Inputs</h5>
+              <ul className="inputs-list">
+                {enhancedInputs.map((input, index) => (
+                  <li key={index}>
+                    <span className="input-label">
+                      {input.icon}
+                      {input.label}:
+                    </span>
+                    <strong>{formatValue(input.value, input.type)}</strong>
+                  </li>
+                ))}
+              </ul>
+              <hr />
+              <h5>Decision Logic Chain</h5>
+              <ul className="rules-list">
+                {rulesTriggered.map((rule, index) => (
+                  <li key={index} className={rule.startsWith("RULE:") ? 'final-rule' : ''}>
+                    {rule.replace("RULE: ", "")}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          
+          {/* --- Enhanced Live Demand Intel --- */}
+          {news_articles && news_articles.length > 0 && (
+            <div className="hub-section">
+              <h4 className="section-title">Live Market Intelligence</h4>
+              <div className="news-feed">
+                {news_articles.slice(0, 4).map((article, index) => (
+                  <a 
+                    href={article.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="news-card" 
+                    key={index}
+                  >
+                    <div className="news-source">
+                      {article.source || 'Market Intelligence'}
+                    </div>
+                    <div className="news-title">{article.title}</div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* --- Enhanced Strategic Substitutes --- */}
+          {substitutes && substitutes.length > 0 && (
+            <div className="hub-section">
+              <h4 className="section-title">Strategic Alternatives</h4>
+              <div className="substitute-grid">
+                {substitutes.slice(0, 3).map(item => (
+                  <div key={item.id} className="substitute-card">
+                    <h5>{item.name}</h5>
+                    <p>SKU: {item.sku}</p>
+                    <div className="similarity-metric">
+                      {(item.similarity * 100).toFixed(0)}% Match
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

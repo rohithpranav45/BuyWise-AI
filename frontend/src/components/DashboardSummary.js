@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import './DashboardSummary.css';
 
 const DashboardSummary = ({ products, statuses, activeFilter, onFilterChange, selectedCategory, onBackToCategories }) => {
+  // --- vvvvvv THIS IS THE LOGIC FIX vvvvvv ---
+  // We calculate the counts ONLY from the products visible in this category.
   const counts = products.reduce((acc, product) => {
     const status = statuses[product.id];
     if (status) {
@@ -10,6 +12,7 @@ const DashboardSummary = ({ products, statuses, activeFilter, onFilterChange, se
     }
     return acc;
   }, {});
+  // --- ^^^^^^ END OF THE LOGIC FIX ^^^^^^ ---
   
   const categoryDisplayName = selectedCategory.replace(/_/g, ' ');
 
@@ -27,16 +30,19 @@ const DashboardSummary = ({ products, statuses, activeFilter, onFilterChange, se
           All Products ({products.length})
         </button>
         {Object.entries(counts).map(([status, count]) => {
-          const className = status.toLowerCase().replace(/ /g, '-');
-          return (
-            <button
-              key={status}
-              onClick={() => onFilterChange(status)}
-              className={`filter-badge ${className} ${activeFilter === status ? 'active' : ''}`}
-            >
-              {status} ({count})
-            </button>
-          );
+          if (count > 0) { // Only show filters if there are products with that status
+            const className = status.toLowerCase().replace(/ /g, '-');
+            return (
+              <button
+                key={status}
+                onClick={() => onFilterChange(status)}
+                className={`filter-badge ${className} ${activeFilter === status ? 'active' : ''}`}
+              >
+                {status} ({count})
+              </button>
+            );
+          }
+          return null;
         })}
       </div>
     </div>

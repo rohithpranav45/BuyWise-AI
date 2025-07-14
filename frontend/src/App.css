@@ -1,33 +1,43 @@
+/* --- The "Walmart Pro" Definitive Design System --- */
 :root {
-  /* Main Colors */
+  /* Main Brand Colors */
   --primary-blue: #004c91;
   --spark-yellow: #ffc220;
-  --dark-theme-bg: #0d1a2b;
-  --dark-theme-surface: #1d2d3d;
   
-  /* Light Theme Content Area */
+  /* "Command Center" Dark Theme (for headers, modals) */
+  --immersive-bg: #015ace;
+  --command-centre-surface: #1d2d3d;
+  
+  /* "Focus Mode" Light Theme (for main content) */
   --light-theme-bg: #f4f6f8;
   --light-theme-surface: #ffffff;
   
-  --border-color: #e0e6ed;
-  --text-primary: #1d2d3d;
-  --text-secondary: #5a6a7b;
-  --text-on-dark: #ffffff;
+  /* Borders */
+  --border-color-light: #e0e6ed;
+  --border-color-dark: rgba(255, 255, 255, 0.2);
+  
+  /* Typography */
+  --text-primary: #1d2d3d; /* For light backgrounds */
+  --text-secondary: #5a6a7b; /* For light backgrounds */
+  --text-on-dark: #ffffff;   /* For dark backgrounds */
 
-  /* Semantic Colors */
-  --color-success: #21a464; /* Green */
-  --color-info:    #17a2b8; /* Teal */
-  --color-orange:  #fd7e14; /* Orange */
-  --color-warning: #ffc107; /* Yellow */
-  --color-danger:  #dc3545; /* Red */
-  --color-secondary: #6c757d; /* Gray */
+  /* Semantic (Decision) Colors */
+  --color-success: #21a464;
+  --color-info:    #17a2b8;
+  --color-orange:  #fd7e14;
+  --color-danger:  #dc3545;
+  --color-secondary: #6c757d;
+  --color-warning: #ffc107;
 
+  /* Universal Styles */
   --font-family-base: 'Inter', -apple-system, sans-serif;
   --border-radius: 8px;
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --transition-base: all 0.2s ease-in-out;
 }
 
+/* --- THE CRITICAL FIX --- */
+/* The default background for the entire app body should be LIGHT */
 body {
   margin: 0;
   font-family: var(--font-family-base);
@@ -44,7 +54,7 @@ body {
 .main-content {
   flex-grow: 1;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 32px;
 }

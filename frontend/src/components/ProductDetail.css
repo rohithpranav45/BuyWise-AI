@@ -1,5 +1,5 @@
 .product-detail-container {
-  background: var(--light-theme-surface);
+  background: var(--content-surface);
   padding: 24px;
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
@@ -107,7 +107,8 @@
 }
 
 .simulation-container {
-  border: 1px solid var(--border-color);
+  background-color: #f8f9fa; /* A subtle off-white */
+  border: 1px solid var(--border-color-light);
   border-radius: var(--border-radius);
   padding: var(--card-padding);
   margin-top: 24px;
@@ -118,8 +119,9 @@
 }
 
 .rerun-button {
-  background-color: var(--spark-yellow);
-  color: var(--text-primary);
+  background: var(--primary-blue);
+  color: var(--text-on-dark);
+  box-shadow: 0 4px 14px 0 rgba(0, 76, 145, 0.39);
   border: none;
   padding: 12px 24px;
   border-radius: var(--border-radius);
@@ -129,7 +131,7 @@
 }
 
 .rerun-button:hover {
-  transform: scale(1.03);
+  background: #003e70;;
 }
 
 input[type="range"] {

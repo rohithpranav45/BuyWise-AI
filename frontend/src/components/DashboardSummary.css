@@ -2,22 +2,23 @@
   background-color: var(--light-theme-surface);
   padding: 24px;
   border-radius: var(--border-radius);
-  margin-bottom: 25px;
+  margin-bottom: 32px;
   box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-color-light);
 }
-/* ... (the rest of the DashboardSummary CSS remains the same from the previous step) ... */
 
 .summary-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color-light);
 }
 
 .summary-title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 600;
   color: var(--text-primary);
   text-transform: capitalize;
@@ -25,7 +26,7 @@
 
 .back-btn {
   background-color: transparent;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-color-light);
   padding: 8px 16px;
   border-radius: var(--border-radius);
   cursor: pointer;
@@ -36,7 +37,7 @@
 }
 
 .back-btn:hover {
-  background-color: var(--bg-light);
+  background-color: var(--light-theme-bg);
   border-color: #cdd5df;
   color: var(--text-primary);
 }
@@ -47,29 +48,43 @@
   gap: 12px;
 }
 
+/* --- vvvvvv THIS IS THE CORRECTED STYLING vvvvvv --- */
+
+/* Default state for all filter badges */
 .filter-badge {
-  border: 1px solid var(--border-color);
-  background-color: transparent;
-  color: var(--text-secondary);
+  border: 1px solid var(--border-color-light);
+  background-color: #f8f9fa; /* A very light gray background for contrast */
+  color: var(--text-primary); /* A strong, readable text color */
+  opacity: 0.8;
   border-radius: 20px;
   padding: 8px 16px;
   font-size: 0.9rem;
   font-weight: 600;
   transition: var(--transition-base);
+  cursor: pointer;
 }
 
+/* Hover state for unselected badges */
 .filter-badge:hover {
-  background-color: var(--bg-light);
+  opacity: 1;
   border-color: #cdd5df;
+  transform: translateY(-2px);
 }
 
+/* --- ^^^^^^ END OF CORRECTION ^^^^^^ --- */
+
+
+/* The active state overrides the default styles for a colorful "pop" */
 .filter-badge.active {
-  color: white;
+  color: var(--text-on-dark);
   border-color: transparent;
+  font-weight: 700;
+  opacity: 1;
+  transform: scale(1.05);
 }
 
-/* Colors for each active filter badge */
-.filter-badge.all.active { background-color: #495057; }
+/* Specific colors for each active filter badge */
+.filter-badge.all.active { background-color: var(--text-secondary); }
 .filter-badge.bulk-order.active { background-color: var(--color-success); }
 .filter-badge.standard-order.active { background-color: var(--color-info); }
 .filter-badge.use-substitute.active { background-color: var(--color-orange); }

@@ -14,7 +14,7 @@
   /* --- vvvvvv THIS IS THE CORRECTED BACKGROUND vvvvvv --- */
   background-color: #0d1a2b;
   background-image: 
-    linear-gradient(rgba(1, 41, 95, 0.8), rgba(1, 41, 95, 0.8)),
+    linear-gradient(#015ace, rgba(1, 41, 95, 0.8)),
     radial-gradient(ellipse at bottom, #002D62, #0d1a2b);
   /* --- ^^^^^^ END OF BACKGROUND FIX ^^^^^^ --- */
 }

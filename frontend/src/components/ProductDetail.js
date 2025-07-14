@@ -3,13 +3,11 @@ import PropTypes from 'prop-types';
 import DeeperAnalysisDashboard from './DeeperAnalysisDashboard';
 import './ProductDetail.css';
 
-const ProductDetail = ({ product, analysisResult, isLoading, onBack, onRerunAnalysis }) => {
-  // --- STATE FOR THE SIMULATOR NOW LIVES HERE ---
+const ProductDetail = ({ product, analysisResult, isLoading, onBack, onRerunAnalysis, allProducts, allTariffs }) => {
   const [simTariff, setSimTariff] = useState(null);
   const [simDemand, setSimDemand] = useState(null);
 
   useEffect(() => {
-    // Initialize slider values when analysis data first arrives
     if (analysisResult?.analysis?.inputs) {
       setSimTariff(analysisResult.analysis.inputs.tariffRate);
       setSimDemand(analysisResult.analysis.inputs.demandSignal);
@@ -17,10 +15,7 @@ const ProductDetail = ({ product, analysisResult, isLoading, onBack, onRerunAnal
   }, [analysisResult]);
 
   const handleRerunClick = () => {
-    // Guard clause
     if (isLoading || !product || simTariff === null) return;
-    
-    // Call the analysis function passed from App.js
     onRerunAnalysis(product.id, {
       customTariff: simTariff,
       customDemand: simDemand,
@@ -46,21 +41,20 @@ const ProductDetail = ({ product, analysisResult, isLoading, onBack, onRerunAnal
         </div>
       </div>
 
-      {/* --- The Dashboard now handles EVERYTHING, including the simulator --- */}
       <DeeperAnalysisDashboard 
         analysis={analysisResult?.analysis} 
         recommendation={analysisResult?.recommendation}
-        // --- vvvvvv NEW PROPS FOR SIMULATOR vvvvvv ---
         isSimLoading={isLoading}
         simTariff={simTariff}
         simDemand={simDemand}
         onSimTariffChange={setSimTariff}
         onSimDemandChange={setSimDemand}
         onRerun={handleRerunClick}
-        // --- ^^^^^^ END OF NEW PROPS ^^^^^^ ---
+        // Pass the new data down
+        primaryProduct={product}
+        allProducts={allProducts}
+        allTariffs={allTariffs}
       />
-      
-      {/* --- THE OLD SIMULATOR UI IS REMOVED FROM HERE --- */}
     </div>
   );
 };
@@ -71,6 +65,13 @@ ProductDetail.propTypes = {
   isLoading: PropTypes.bool,
   onBack: PropTypes.func.isRequired,
   onRerunAnalysis: PropTypes.func.isRequired,
+  allProducts: PropTypes.array, // Can be empty initially
+  allTariffs: PropTypes.object, // Can be empty initially
 };
+
+ProductDetail.defaultProps = {
+  allProducts: [],
+  allTariffs: {},
+}
 
 export default ProductDetail;

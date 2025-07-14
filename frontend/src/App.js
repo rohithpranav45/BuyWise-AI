@@ -6,11 +6,12 @@ import Placeholder from './components/Placeholder';
 import DashboardSummary from './components/DashboardSummary';
 import StoreSelectorModal from './components/StoreSelectorModal';
 import CategorySelector from './components/CategorySelector';
-import { fetchProducts, analyzeProduct, fetchDashboardStatus } from './api/client';
+import { fetchProducts, analyzeProduct, fetchDashboardStatus, fetchTariffs } from './api/client';
 import './App.css';
 
 function App() {
   const [products, setProducts] = useState([]);
+  const [tariffs, setTariffs] = useState({}); // <-- NEW STATE
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [loading, setLoading] = useState({ app: true, analysis: false });
@@ -35,10 +36,15 @@ function App() {
   useEffect(() => {
     if (selectedStore) {
       setLoading(prev => ({ ...prev, app: true }));
-      Promise.all([fetchProducts(), fetchDashboardStatus()])
-        .then(([productsResponse, statusResponse]) => {
+      Promise.all([
+        fetchProducts(), 
+        fetchDashboardStatus(),
+        fetchTariffs() // Fetch tariffs on load
+      ])
+        .then(([productsResponse, statusResponse, tariffsResponse]) => {
           setProducts(productsResponse.data || []);
           setDashboardStatus(statusResponse.data || {});
+          setTariffs(tariffsResponse.data || {}); // Set tariffs state
         })
         .catch(err => handleError(err, 'fetchInitialData'))
         .finally(() => setLoading(prev => ({ ...prev, app: false })));
@@ -115,6 +121,9 @@ function App() {
               isLoading={loading.analysis}
               onBack={handleBackToProducts}
               onRerunAnalysis={runAnalysis}
+              // Pass all data down
+              allProducts={products}
+              allTariffs={tariffs}
             />
           ) : (
             <>

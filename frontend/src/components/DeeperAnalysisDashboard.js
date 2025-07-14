@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import FactorAnalysisCard from './FactorAnalysisCard';
 import SupplyChainMap from './SupplyChainMap';
+import TariffImpactAnalysis from './TariffImpactAnalysis';
 import './DeeperAnalysisDashboard.css';
 
 // --- HELPER: DYNAMIC STYLES & ICONS FOR HERO CARD ---
@@ -75,7 +76,6 @@ const factorIcons = {
   urgency: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
 };
 
-
 // --- MAIN COMPONENT ---
 const DeeperAnalysisDashboard = ({
   analysis,
@@ -85,7 +85,10 @@ const DeeperAnalysisDashboard = ({
   simDemand,
   onSimTariffChange,
   onSimDemandChange,
-  onRerun
+  onRerun,
+  primaryProduct,
+  allProducts,
+  allTariffs,
 }) => {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -133,7 +136,6 @@ const DeeperAnalysisDashboard = ({
         {/* === MAIN CONTENT COLUMN === */}
         <div className="main-column">
           
-          {/* --- Hero Recommendation Card --- */}
           <div className={`hero-card ${heroStyle.className}`}>
             <div className="hero-icon">{heroStyle.icon}</div>
             <div className="hero-text">
@@ -141,8 +143,17 @@ const DeeperAnalysisDashboard = ({
               <p>{decisionNarrative || heroStyle.description}</p>
             </div>
           </div>
+
+          <div className="hub-section">
+            <h4 className="section-title">Tariff Impact & ROI Analysis</h4>
+            <TariffImpactAnalysis
+              primaryProduct={primaryProduct}
+              allProducts={allProducts}
+              allTariffs={allTariffs}
+              substitutes={substitutes || []}
+            />
+          </div>
           
-          {/* --- Supply Chain Map --- */}
           {supplyChainMapData && supplyChainMapData.length > 0 && (
             <div className="hub-section">
               <h4 className="section-title">Supply Chain Visualization</h4>
@@ -150,7 +161,6 @@ const DeeperAnalysisDashboard = ({
             </div>
           )}
 
-          {/* --- Core Factor Analysis --- */}
           <div className="hub-section">
             <h4 className="section-title">Core Factor Analysis</h4>
             <div className="factor-grid">
@@ -175,7 +185,6 @@ const DeeperAnalysisDashboard = ({
             </div>
           </div>
 
-          {/* --- "What-If" Scenario Simulator --- */}
           <div className="hub-section">
             <h4 className="section-title">"What-If" Scenario Simulator</h4>
             <div className="simulation-card">
@@ -206,8 +215,6 @@ const DeeperAnalysisDashboard = ({
 
         {/* === SIDEBAR COLUMN === */}
         <div className="sidebar-column">
-
-          {/* --- Analysis Breakdown Card --- */}
           <div className="hub-section">
             <h4 className="section-title">Analysis Breakdown</h4>
             <div className="breakdown-card">
@@ -227,30 +234,19 @@ const DeeperAnalysisDashboard = ({
               <h5>Decision Logic Chain</h5>
               <ul className="rules-list">
                 {rulesTriggered.map((rule, index) => (
-                  <li key={index} className={rule.startsWith("RULE:") ? 'final-rule' : ''}>
-                    {rule.replace("RULE: ", "")}
-                  </li>
+                  <li key={index} className={rule.startsWith("RULE:") ? 'final-rule' : ''}>{rule.replace("RULE: ", "")}</li>
                 ))}
               </ul>
             </div>
           </div>
           
-          {/* --- Live Market Intelligence --- */}
           {news_articles && news_articles.length > 0 && (
             <div className="hub-section">
               <h4 className="section-title">Live Market Intelligence</h4>
               <div className="news-feed">
                 {news_articles.slice(0, 4).map((article, index) => (
-                  <a 
-                    href={article.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="news-card" 
-                    key={index}
-                  >
-                    <div className="news-source">
-                      {article.source || 'Market Intelligence'}
-                    </div>
+                  <a href={article.url} target="_blank" rel="noopener noreferrer" className="news-card" key={index}>
+                    <div className="news-source">{article.source || 'Market Intelligence'}</div>
                     <div className="news-title">{article.title}</div>
                   </a>
                 ))}
@@ -258,7 +254,6 @@ const DeeperAnalysisDashboard = ({
             </div>
           )}
 
-          {/* --- Strategic Alternatives --- */}
           {substitutes && substitutes.length > 0 && (
             <div className="hub-section">
               <h4 className="section-title">Strategic Alternatives</h4>
@@ -267,9 +262,7 @@ const DeeperAnalysisDashboard = ({
                   <div key={item.id} className="substitute-card">
                     <h5>{item.name}</h5>
                     <p>SKU: {item.sku}</p>
-                    <div className="similarity-metric">
-                      {(item.similarity * 100).toFixed(0)}% Match
-                    </div>
+                    <div className="similarity-metric">{(item.similarity * 100).toFixed(0)}% Match</div>
                   </div>
                 ))}
               </div>
@@ -291,6 +284,9 @@ DeeperAnalysisDashboard.propTypes = {
   onSimTariffChange: PropTypes.func,
   onSimDemandChange: PropTypes.func,
   onRerun: PropTypes.func,
+  primaryProduct: PropTypes.object,
+  allProducts: PropTypes.array,
+  allTariffs: PropTypes.object,
 };
 
 export default DeeperAnalysisDashboard;

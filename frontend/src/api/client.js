@@ -77,6 +77,18 @@ export const fetchProducts = async () => {
   }
 };
 
+// --- vvvvvv ADD THIS NEW FUNCTION vvvvvv ---
+export const fetchTariffs = async () => {
+  try {
+    const response = await client.get('/tariffs');
+    return { data: response.data || {} };
+  } catch (error) {
+    console.error('❌ Failed to fetch tariffs:', error);
+    throw error;
+  }
+};
+// --- ^^^^^^ END OF NEW FUNCTION ^^^^^^ ---
+
 export const analyzeProduct = async (productId, storeId, customInputs = {}) => {
   try {
     console.log('🔍 Starting analysis for product:', productId, 'store:', storeId);
@@ -87,21 +99,16 @@ export const analyzeProduct = async (productId, storeId, customInputs = {}) => {
     
     console.log('🎯 Raw API response:', response.data);
     
-    // More flexible response validation
     if (!response.data) {
       throw new Error('No data received from analysis API');
     }
     
-    // Handle different response formats
     let analysisData;
     if (response.data.recommendation) {
-      // Direct format
       analysisData = response.data;
     } else if (response.data.data && response.data.data.recommendation) {
-      // Wrapped format
       analysisData = response.data.data;
     } else {
-      // Fallback - create a basic structure
       analysisData = {
         recommendation: response.data.recommendation || 'Unknown',
         analysis: response.data.analysis || { 

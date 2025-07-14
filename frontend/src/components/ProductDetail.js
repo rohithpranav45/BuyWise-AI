@@ -4,27 +4,34 @@ import DeeperAnalysisDashboard from './DeeperAnalysisDashboard';
 import './ProductDetail.css';
 
 const ProductDetail = ({ product, analysisResult, isLoading, onBack, onRerunAnalysis }) => {
+  // --- STATE FOR THE SIMULATOR NOW LIVES HERE ---
   const [simTariff, setSimTariff] = useState(null);
   const [simDemand, setSimDemand] = useState(null);
 
   useEffect(() => {
+    // Initialize slider values when analysis data first arrives
     if (analysisResult?.analysis?.inputs) {
       setSimTariff(analysisResult.analysis.inputs.tariffRate);
       setSimDemand(analysisResult.analysis.inputs.demandSignal);
     }
   }, [analysisResult]);
 
-  const handleRerunAnalysis = () => {
-    if (isLoading || !product) return;
+  const handleRerunClick = () => {
+    // Guard clause
+    if (isLoading || !product || simTariff === null) return;
+    
+    // Call the analysis function passed from App.js
     onRerunAnalysis(product.id, {
       customTariff: simTariff,
       customDemand: simDemand,
     });
   };
 
-  if (!product) { return <div>Loading product information...</div>; }
+  if (!product) {
+    return <div>Loading product information...</div>;
+  }
   
-  const { name, sku, category, price, imageUrl } = product;
+  const { name, sku, category, imageUrl } = product;
 
   return (
     <div className="product-detail-container">
@@ -39,37 +46,21 @@ const ProductDetail = ({ product, analysisResult, isLoading, onBack, onRerunAnal
         </div>
       </div>
 
-      {isLoading && !analysisResult ? (
-        <div className="loading-analysis">
-          {/* Placeholder for loading state can go here */}
-        </div>
-      ) : (
-        <>
-          <DeeperAnalysisDashboard 
-            analysis={analysisResult?.analysis} 
-            recommendation={analysisResult?.recommendation}
-          />
-          <div className="simulation-container">
-            <h3>What-If Scenario Simulator</h3>
-            <p>Adjust the sliders to see how external factors impact the procurement decision.</p>
-            {simTariff !== null ? (
-              <div className="slider-group">
-                <label>Tariff Rate: <strong>{(simTariff * 100).toFixed(1)}%</strong></label>
-                <input type="range" min="0" max="0.5" step="0.01" value={simTariff} onChange={(e) => setSimTariff(parseFloat(e.target.value))} />
-              </div>
-            ) : <p>Loading simulator...</p>}
-            {simDemand !== null ? (
-              <div className="slider-group">
-                <label>Demand Signal: <strong>{simDemand.toFixed(2)}</strong></label>
-                <input type="range" min="-1" max="1" step="0.1" value={simDemand} onChange={(e) => setSimDemand(parseFloat(e.target.value))} />
-              </div>
-            ) : null}
-            <button onClick={handleRerunAnalysis} disabled={isLoading || simTariff === null} className="rerun-button">
-              {isLoading ? 'Re-analyzing...' : '⚡ Re-Run Analysis'}
-            </button>
-          </div>
-        </>
-      )}
+      {/* --- The Dashboard now handles EVERYTHING, including the simulator --- */}
+      <DeeperAnalysisDashboard 
+        analysis={analysisResult?.analysis} 
+        recommendation={analysisResult?.recommendation}
+        // --- vvvvvv NEW PROPS FOR SIMULATOR vvvvvv ---
+        isSimLoading={isLoading}
+        simTariff={simTariff}
+        simDemand={simDemand}
+        onSimTariffChange={setSimTariff}
+        onSimDemandChange={setSimDemand}
+        onRerun={handleRerunClick}
+        // --- ^^^^^^ END OF NEW PROPS ^^^^^^ ---
+      />
+      
+      {/* --- THE OLD SIMULATOR UI IS REMOVED FROM HERE --- */}
     </div>
   );
 };

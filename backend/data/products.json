@@ -23,7 +23,7 @@
     "category": "electronics",
     "countryOfOrigin": "China",
     "imageUrl": "/product_images/prod_003.png",
-    "inventory": { "stock": 15, "salesVelocity": 2 },
+    "inventory": { "stock": 150, "salesVelocity": 2 },
     "baseCost": 780.00, "price": 1020.00, "sku": "SONY55LED4K", "features": ["55-inch", "LED", "4K", "Smart TV", "HDR"]
   },
   {

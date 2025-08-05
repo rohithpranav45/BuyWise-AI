@@ -10,15 +10,14 @@
 **Transforming global supply chain complexity into local competitive advantage**
 
 🚀 **Live Demo**: [https://your-frontend-deployment-url.vercel.app/](https://your-frontend-deployment-url.vercel.app/)  
-📹 **Video Walkthrough**: [https://www.youtube.com/watch?v=your_video_id](https://www.youtube.com/watch?v=your_video_id)
+📹 **Video Walkthrough**: [Youtube Video](https://youtu.be/W4k02wXZwn0)
 
 ---
 
 ## 📸 Application Preview
 
 ### Main Dashboard Interface
-![StoreIQ Dashboard](https://via.placeholder.com/900x500/f8f9fa/343a40?text=StoreIQ+Dashboard+Screenshot)
-*Replace this placeholder with your actual dashboard screenshot*
+![StoreIQ Dashboard](<img width="1919" height="960" alt="Image" src="https://github.com/user-attachments/assets/7025788e-455d-45bd-88d0-12fcd53211f6" />)
 
 ---
 
@@ -334,19 +333,22 @@ def generate_smart_recommendation(product_data, market_sentiment, alternatives):
 ## 📱 Application Screenshots
 
 ### Store Selection Interface
-![Store Selector Modal](https://via.placeholder.com/800x400/e9ecef/495057?text=Store+Selection+Interface)
+![Store Selector Modal](<img width="1919" height="960" alt="Image" src="https://github.com/user-attachments/assets/7025788e-455d-45bd-88d0-12fcd53211f6" />)
 *Interactive map interface for store selection with department highlights*
 
 ### Tariff Impact & ROI Analysis
-![ROI Analysis Dashboard](https://via.placeholder.com/800x400/e9ecef/495057?text=ROI+Analysis+Component)
+![ROI Analysis Dashboard](<img width="1893" height="939" alt="Image" src="https://github.com/user-attachments/assets/6f57bad6-2753-4f4e-8ca8-f75beeeeee73" />
+)
 *Financial breakdown showing cost optimization opportunities and profit projections*
 
 ### Supply Chain Visualization
-![Supply Chain Map](https://via.placeholder.com/800x400/e9ecef/495057?text=Supply+Chain+Risk+Visualization)
+![Supply Chain Map](<img width="1892" height="936" alt="Image" src="https://github.com/user-attachments/assets/e2320c06-24c8-4df4-bb30-9ff1d8b811c1" />
+)
 *Geographic visualization of supply routes with real-time risk assessment*
 
 ### Factor Analysis Cards
-![Analytics Dashboard](https://via.placeholder.com/800x400/e9ecef/495057?text=Core+Metrics+Dashboard)
+![Analytics Dashboard](<img width="1887" height="939" alt="Image" src="https://github.com/user-attachments/assets/7d0458a3-61fc-4e75-b311-e9c75d856914" />
+)
 *Clean visualization of Cost, Demand, and Urgency metrics with trend indicators*
 
 ---

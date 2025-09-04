@@ -9,12 +9,12 @@
 
 **Transforming global supply chain complexity into local competitive advantage**
 
-🚀 **Live Application**: [StoreIQ](https://projectsparkathon.vercel.app/)  
-📹 **Video Walkthrough**: [Youtube Video](https://youtu.be/W4k02wXZwn0)
+ **Live Application**: [StoreIQ](https://projectsparkathon.vercel.app/)  
+ **Video Walkthrough**: [Youtube Video](https://youtu.be/W4k02wXZwn0)
 
 ---
 
-## 📸 Application Preview
+##  Application Preview
 
 ### Main Dashboard Interface
 ![StoreIQ Dashboard](https://github.com/user-attachments/assets/7025788e-455d-45bd-88d0-12fcd53211f6/)
@@ -29,14 +29,14 @@ StoreIQ is a data-driven intelligence platform built to empower Walmart store ma
 
 In today's global economy, retail supply chains are a high-stakes battlefield. Store managers are on the front lines, facing a constant barrage of challenges:
 
-- **⚡ Volatile Tariffs**: Sudden international tariff hikes can instantly erase the profit margins of best-selling products
-- **📈 Unpredictable Demand**: Consumer interest, driven by social media trends and news cycles, is more chaotic and harder to forecast than ever
-- **💔 Information Silos**: Critical data on tariffs, inventory, and market sentiment is often disconnected, forcing managers to make high-impact decisions with an incomplete picture
-- **⏰ Time Pressure**: Market windows demand immediate, informed decisions
+- ** Volatile Tariffs**: Sudden international tariff hikes can instantly erase the profit margins of best-selling products
+- ** Unpredictable Demand**: Consumer interest, driven by social media trends and news cycles, is more chaotic and harder to forecast than ever
+- ** Information Silos**: Critical data on tariffs, inventory, and market sentiment is often disconnected, forcing managers to make high-impact decisions with an incomplete picture
+- ** Time Pressure**: Market windows demand immediate, informed decisions
 
 This environment forces a reactive approach, leading to missed opportunities and unnecessary financial losses.
 
-### Our Solution: StoreIQ - The Financial Co-Pilot 🎯
+### Our Solution: StoreIQ - The Financial Co-Pilot 
 
 StoreIQ transforms this reactive battle into a proactive strategy. It's an intelligence platform that acts as a financial co-pilot for every store manager, translating complex global data into simple, actionable, and profitable recommendations.
 
@@ -44,31 +44,31 @@ We don't just show data; we provide a clear path forward, turning global market 
 
 ---
 
-## ✨ Key Features: A 360-Degree Intelligence Hub
+##  Key Features: A 360-Degree Intelligence Hub
 
 StoreIQ guides the manager through a logical funnel of discovery, from a high-level overview to granular, actionable insights:
 
-### 🌎 Interactive Command Center
+###  Interactive Command Center
 An immersive map interface to select a store and immediately see which product departments require strategic attention.
 
-### 💡 AI-Powered Recommendations  
+###  AI-Powered Recommendations  
 Every product in the dashboard is tagged with a clear procurement directive powered by our backend decision engine.
 
-### 💰 Tariff Impact & ROI Analysis
+###  Tariff Impact & ROI Analysis
 Our flagship component provides a side-by-side financial breakdown of sourcing options, crystallizing the benefit of a strategic pivot into a concrete Potential Profit Increase.
 
-### 🗺️ Supply Chain Visualization
+###  Supply Chain Visualization
 An interactive map that plots primary and alternative supply routes, color-coded by tariff risk.
 
 ### 📊 Core Factor Analysis
 Transparent, at-a-glance cards that visualize the key metrics of Cost, Demand, and Urgency.
 
-### 🔬 "What-If" Scenario Simulator
+###  "What-If" Scenario Simulator
 An empowering tool within the main dashboard that allows managers to stress-test the supply chain against future changes.
 
 ---
 
-## 🛠️ Architecture & Project Structure
+## 🛠 Architecture & Project Structure
 
 StoreIQ is built on a modern, decoupled architecture with a React frontend and a Python/Flask backend.
 
@@ -163,7 +163,7 @@ graph TB
 
 ---
 
-## 🔄 How It Works: The Data Pipeline
+##  How It Works: The Data Pipeline
 
 ### Request to Recommendation Flow
 
@@ -204,16 +204,16 @@ graph LR
 
 ### Processing Steps
 
-1. **📨 Request** (`frontend/src/api/client.js`): The React frontend sends a productID and storeID to the `/api/analyze` endpoint
+1. ** Request** (`frontend/src/api/client.js`): The React frontend sends a productID and storeID to the `/api/analyze` endpoint
 
-2. **⚡ Parallel Processing** (`backend/app.py`): The Flask backend orchestrates several tasks in parallel:
-   - **📰 Demand Analysis** (`news_service.py`): Fetches and analyzes news sentiment via NewsAPI and TextBlob
-   - **🤖 ML-Powered Substitution** (`decision_service.py`): Identifies the best substitutes using a Scikit-learn cosine similarity model
-   - **⚠️ Risk Analysis** (`decision_service.py`): Calculates urgency and cost scores based on static data and weather data
+2. ** Parallel Processing** (`backend/app.py`): The Flask backend orchestrates several tasks in parallel:
+   - ** Demand Analysis** (`news_service.py`): Fetches and analyzes news sentiment via NewsAPI and TextBlob
+   - ** ML-Powered Substitution** (`decision_service.py`): Identifies the best substitutes using a Scikit-learn cosine similarity model
+   - ** Risk Analysis** (`decision_service.py`): Calculates urgency and cost scores based on static data and weather data
 
-3. **🧠 Decision Engine** (`decision_service.py`): All data points are fed into a custom rule-based engine that determines the final recommendation and a human-readable "Decision Narrative"
+3. ** Decision Engine** (`decision_service.py`): All data points are fed into a custom rule-based engine that determines the final recommendation and a human-readable "Decision Narrative"
 
-4. **📊 Response & Visualization** (`DeeperAnalysisDashboard.js`): The engine's output and all supporting data are consolidated into a single JSON response. The React frontend receives this object and efficiently populates the entire dashboard
+4. ** Response & Visualization** (`DeeperAnalysisDashboard.js`): The engine's output and all supporting data are consolidated into a single JSON response. The React frontend receives this object and efficiently populates the entire dashboard
 
 ### Real-Time Processing Architecture
 

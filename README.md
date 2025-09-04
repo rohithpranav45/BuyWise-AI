@@ -46,7 +46,7 @@ We don't just show data; we provide a clear path forward, turning global market 
 
 ##  Key Features: A 360-Degree Intelligence Hub
 
-StoreIQ guides the manager through a logical funnel of discovery, from a high-level overview to granular, actionable insights:
+StoreIQ guides the manager through a logical funnel of discovery, from a high-level overview to granular, actionable insights-
 
 ###  Interactive Command Center
 An immersive map interface to select a store and immediately see which product departments require strategic attention.

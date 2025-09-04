@@ -61,7 +61,7 @@ Our flagship component provides a side-by-side financial breakdown of sourcing o
 An interactive map that plots primary and alternative supply routes, color-coded by tariff risk.
 
 ### 📊 Core Factor Analysis
-Transparent, at-a-glance cards that visualize the key metrics of Cost, Demand, and Urgency.
+Transparent, at-a-glance cards that visualize the key metrics of Cost, Demand and Urgency.
 
 ###  "What-If" Scenario Simulator
 An empowering tool within the main dashboard that allows managers to stress-test the supply chain against future changes.

@@ -462,24 +462,24 @@ Content-Type: application/json
 
 ---
 
-## 🔮 Future Scope
+##  Future Scope
 
 While StoreIQ is a powerful tool, its architecture is built for growth. Future enhancements could include:
 
 ### Phase 1: Enhanced Intelligence 
-- **🔗 Deeper Integration**: Connecting directly to Walmart's real-time sales and inventory databases for even more precise urgency calculations
-- **📱 Mobile Application**: Native iOS/Android applications for on-the-go decision making
-- **🔔 Real-time Alerts**: Push notifications for critical supply chain events
+- ** Deeper Integration**: Connecting directly to Walmart's real-time sales and inventory databases for even more precise urgency calculations
+- ** Mobile Application**: Native iOS/Android applications for on-the-go decision making
+- ** Real-time Alerts**: Push notifications for critical supply chain events
 
 ### Phase 2: Advanced Analytics 
-- **🔮 Advanced Forecasting**: Evolving from sentiment analysis to time-series forecasting models (like ARIMA or Prophet) for demand prediction
-- **🏪 Multi-location Analysis**: Cross-store performance benchmarking and comparative analytics
-- **📋 Compliance Reporting**: Regulatory requirement tracking and automated compliance reports
+- ** Advanced Forecasting**: Evolving from sentiment analysis to time-series forecasting models (like ARIMA or Prophet) for demand prediction
+- ** Multi-location Analysis**: Cross-store performance benchmarking and comparative analytics
+- ** Compliance Reporting**: Regulatory requirement tracking and automated compliance reports
 
 ### Phase 3: AI Enhancement 
-- **🤖 Automated Procurement**: Adding a feature to automatically generate and stage purchase orders based on the system's recommendations, moving from decision support to decision automation
-- **🗣️ Natural Language Interface**: Voice-activated analytics and conversational AI
-- **🌐 Blockchain Integration**: Supply chain transparency and verification
+- ** Automated Procurement**: Adding a feature to automatically generate and stage purchase orders based on the system's recommendations, moving from decision support to decision automation
+- ** Natural Language Interface**: Voice-activated analytics and conversational AI
+- ** Blockchain Integration**: Supply chain transparency and verification
 
 ---
 

@@ -523,46 +523,5 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 
-## 📷 How to Add Screenshots to Your README
-
-### Method 1: GitHub Repository (Recommended)
-1. Create a folder called `screenshots` or `assets` in your repository root
-2. Upload your screenshots to this folder
-3. Reference them in README using relative paths:
-```markdown
-![Dashboard Screenshot](./screenshots/dashboard.png)
-```
-
-### Method 2: Using GitHub Issues (Quick & Easy)
-1. Go to any GitHub issue in your repository
-2. Drag and drop your image into the comment box
-3. GitHub will generate a URL like: `https://user-images.githubusercontent.com/...`
-4. Copy this URL and use it in your README:
-```markdown
-![Dashboard](https://user-images.githubusercontent.com/your-image-url)
-```
-
-### Method 3: External Image Hosting
-Popular services:
-- **Imgur**: Upload → Copy direct link
-- **Cloudinary**: Professional image hosting
-- **GitHub Pages**: Host in `gh-pages` branch
-
-### Screenshot Tips for Maximum Impact
-- **Dashboard**: Full-screen view showing complete interface
-- **Mobile**: Responsive design on different screen sizes  
-- **Features**: Highlight key components with annotations
-- **Workflow**: Show before/after states or step-by-step process
-- **High Quality**: Use PNG format, min 1200px width for clarity
-
-### Recommended Screenshots to Take
-1. **Landing Page**: First impression of your application
-2. **Main Dashboard**: Complete intelligence hub view
-3. **Interactive Map**: Store selection and supply chain visualization
-4. **ROI Analysis**: Financial impact calculations and recommendations
-5. **Mobile View**: Responsive design showcase
-6. **Loading States**: Show real-time data processing
-
----
 
 [⭐ Star Repository](https://github.com/your-username/storeiq) • [🐛 Report Issues](https://github.com/your-username/storeiq/issues) • [💡 Request Features](https://github.com/your-username/storeiq/issues)
